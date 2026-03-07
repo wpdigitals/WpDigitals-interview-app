@@ -206,13 +206,19 @@ Ask if they're ready to begin. Keep it brief and professional."""
     
     elif phase == "phase1":
         return base_msg + """\nPHASE 1: General/Behavioral Questions
-Ask 10 questions to evaluate:
+Ask 10 UNIQUE questions to evaluate:
 - Communication skills
 - Dedication and work ethic
 - Attitude and cultural fit
 - Learning ability and growth mindset
 
-Ask ONE question at a time. After 10 questions, inform them Phase 1 is complete."""
+IMPORTANT: 
+- Ask ONE question at a time
+- NEVER repeat questions that have already been asked
+- Check conversation history before asking new questions
+- Make each question unique and relevant
+
+After 10 questions, inform them Phase 1 is complete."""
     
     elif phase == "phase2":
         tech_focus = "Android architecture, Kotlin, API integration, State management, Database, Automation, AI tools, AWS" if "android" in role.lower() else tech_stack
