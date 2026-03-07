@@ -141,6 +141,13 @@ class InterviewResult(BaseModel):
     strengths: str
     weaknesses: str
     recommendation: str
+    behavior_analysis: Optional[str] = None
+    performance_review: Optional[str] = None
+    swot_analysis: Optional[Dict[str, str]] = None
+    long_term_potential: Optional[str] = None
+    cultural_fit: Optional[str] = None
+    risk_assessment: Optional[str] = None
+    development_plan: Optional[str] = None
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 class ResumeParseRequest(BaseModel):
