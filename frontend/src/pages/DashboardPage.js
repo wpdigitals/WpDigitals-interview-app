@@ -61,9 +61,8 @@ const DashboardPage = () => {
       {/* Header */}
       <header className="px-6 py-6 border-b border-slate-200 bg-white/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-8 h-8 text-indigo-600" />
-            <span className="text-2xl font-bold text-slate-900">AI Interviewer</span>
+          <div className="flex items-center gap-3">
+            <img src={LOGO_URL} alt="WP Digitals" className="h-10" />
           </div>
           <div className="flex items-center gap-4">
             {user?.picture && (
