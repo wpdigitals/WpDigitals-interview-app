@@ -687,17 +687,29 @@ const InterviewPage = () => {
                 className="flex-1 min-h-[100px] resize-none"
                 disabled={loading || !cameraActive}
               />
-              <Button
-                data-testid="send-message-btn"
-                onClick={sendMessage}
-                disabled={loading || !input.trim() || !cameraActive}
-                className="bg-indigo-600 hover:bg-indigo-700 h-[100px] px-8"
-              >
-                {loading ? (
-                  <Loader2 className="w-6 h-6 animate-spin" />
-                ) : (
-                  <Send className="w-6 h-6" />
-                )}
+              <div className="flex flex-col gap-2">
+                <Button
+                  data-testid="send-message-btn"
+                  onClick={sendMessage}
+                  disabled={loading || !input.trim() || !cameraActive}
+                  className="bg-indigo-600 hover:bg-indigo-700 h-[calc(50px-4px)] px-8"
+                >
+                  {loading ? (
+                    <Loader2 className="w-6 h-6 animate-spin" />
+                  ) : (
+                    <Send className="w-6 h-6" />
+                  )}
+                </Button>
+                <Button
+                  data-testid="skip-question-btn"
+                  onClick={handleSkipQuestion}
+                  disabled={loading || !cameraActive}
+                  variant="outline"
+                  className="h-[calc(50px-4px)] px-8"
+                >
+                  Skip Question
+                </Button>
+              </div>
               </Button>
             </div>
           </div>
