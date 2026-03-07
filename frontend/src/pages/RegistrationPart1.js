@@ -190,7 +190,7 @@ const RegistrationPart1 = () => {
                 ) : (
                   <>
                     <Sparkles className="mr-2 h-4 w-4" />
-                    Parse with AI
+                    Parse Resume
                   </>
                 )}
               </Button>
