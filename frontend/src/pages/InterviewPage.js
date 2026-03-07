@@ -212,6 +212,10 @@ const InterviewPage = () => {
           termination_reason: res.data.termination_reason
         }));
         toast.info('Interview has been terminated');
+        // Redirect to termination page
+        setTimeout(() => {
+          navigate(`/interview/${interviewId}/terminated`);
+        }, 2000);
         return;
       }
 
@@ -286,6 +290,10 @@ const InterviewPage = () => {
           termination_reason: res.data.termination_reason
         }));
         toast.info('Interview has been terminated');
+        // Redirect to termination page
+        setTimeout(() => {
+          navigate(`/interview/${interviewId}/terminated`);
+        }, 2000);
         return;
       }
 
