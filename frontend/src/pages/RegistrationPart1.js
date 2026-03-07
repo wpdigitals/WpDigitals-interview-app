@@ -92,7 +92,7 @@ const RegistrationPart1 = () => {
 
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <img src={LOGO_URL} alt="WP Digitals" className="h-16 object-contain" style={{maxWidth: '250px'}} />
+            <img src={LOGO_URL} alt="WP Digitals" className="h-32 object-contain max-w-[500px]" />
           </div>
           <h1 className="text-3xl font-bold text-slate-900 mb-2">Upload Your Resume</h1>
           <p className="text-slate-600">Smart parsing will automatically extract your details</p>
