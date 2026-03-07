@@ -17,7 +17,7 @@ const LandingPage = () => {
           </div>
           <Button 
             data-testid="start-interview-btn"
-            onClick={() => navigate('/register')} 
+            onClick={() => navigate('/login')} 
             className="bg-indigo-600 hover:bg-indigo-700"
           >
             Start Interview
