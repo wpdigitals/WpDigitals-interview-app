@@ -374,6 +374,7 @@ const InterviewPage = () => {
       // Reset timer for new question
       setQuestionStartTime(Date.now());
       setTimer(120);
+      setBeepPlayed(false); // Reset beep flag
 
       if (res.data.status === 'completed') {
         stopRecording();
