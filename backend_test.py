@@ -448,7 +448,7 @@ def main():
             print(f"   ✅ Interview completed after {i} additional messages")
             break
             
-        tester.test_send_message(message, f"Additional Message {i+1}")
+        tester.test_send_message(message, f"Additional Message {i+1}", 30 + (i * 5))  # Varying response times
         time.sleep(2)
     
     # Test remaining endpoints
