@@ -91,11 +91,11 @@ const RegistrationPart1 = () => {
         </div>
 
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Sparkles className="w-8 h-8 text-indigo-600" />
-            <h1 className="text-3xl font-bold text-slate-900">Upload Your Resume</h1>
+          <div className="flex items-center justify-center mb-4">
+            <img src={LOGO_URL} alt="WP Digitals" className="h-12" />
           </div>
-          <p className="text-slate-600">AI will automatically extract and fill your details</p>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Upload Your Resume</h1>
+          <p className="text-slate-600">Smart parsing will automatically extract your details</p>
         </div>
 
         <Card data-testid="resume-upload-card" className="border-slate-200 shadow-xl">
