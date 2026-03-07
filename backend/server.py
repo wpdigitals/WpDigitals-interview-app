@@ -39,6 +39,17 @@ class User(BaseModel):
     picture: Optional[str] = None
     created_at: str
 
+class AdminLogin(BaseModel):
+    email: str
+    password: str
+
+class Admin(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    admin_id: str
+    email: str
+    name: str
+    created_at: str
+
 class UserSession(BaseModel):
     model_config = ConfigDict(extra="ignore")
     user_id: str
