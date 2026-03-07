@@ -319,7 +319,7 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-3 gap-8 mb-8">
             <div>
-              <img src={LOGO_URL} alt="WP Digitals" className="h-8 mb-4 brightness-0 invert" />
+              <img src={LOGO_WHITE_URL} alt="WP Digitals" className="h-16 mb-4 object-contain" />
               <p className="text-slate-400 text-sm">
                 Creative digital agency focused on growing brands online through comprehensive web solutions.
               </p>
