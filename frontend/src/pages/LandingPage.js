@@ -42,7 +42,7 @@ const LandingPage = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button 
               data-testid="get-started-btn"
-              onClick={() => navigate('/register')} 
+              onClick={() => navigate('/login')} 
               size="lg"
               className="bg-indigo-600 hover:bg-indigo-700 text-lg px-8 py-6 rounded-xl"
             >
