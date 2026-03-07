@@ -64,7 +64,7 @@ const InterviewPage = () => {
 
     const interval = setInterval(() => {
       const elapsed = Math.floor((Date.now() - questionStartTime) / 1000);
-      const remaining = 120 - elapsed;
+      const remaining = 300 - elapsed; // 5 minutes = 300 seconds
       
       if (remaining <= 0) {
         setTimer(0);
