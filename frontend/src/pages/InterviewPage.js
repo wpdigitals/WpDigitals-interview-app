@@ -427,6 +427,17 @@ const InterviewPage = () => {
               )}
             </div>
             
+            {/* Stop Interview Button */}
+            <Button
+              onClick={handleStopInterview}
+              variant="destructive"
+              size="sm"
+              className="gap-2"
+            >
+              <StopCircle className="w-4 h-4" />
+              Stop Interview
+            </Button>
+            
             {/* Phase Badge */}
             <div className={`${phaseInfo.color} text-white px-4 py-2 rounded-full text-sm font-semibold`}>
               {phaseInfo.name}
