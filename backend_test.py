@@ -261,6 +261,28 @@ Education: B.Tech Computer Science
             print(f"   Question Number: {response.get('question_number', 'N/A')}")
         
         return success
+    def test_video_upload(self):
+        """Test video chunk upload"""
+        if not self.interview_id:
+            print("❌ Cannot upload video - no interview ID")
+            return False
+        
+        # Create a mock video file (small binary data)
+        mock_video_data = b"MOCK_VIDEO_DATA_CHUNK_" + b"0" * 100
+        files = {'video': ('video_chunk.webm', mock_video_data, 'video/webm')}
+        
+        success, response = self.run_test(
+            "Upload Video Chunk",
+            "POST",
+            f"interviews/{self.interview_id}/video",
+            200,
+            files=files
+        )
+        
+        if success:
+            print(f"   Video upload response: {response}")
+        
+        return success
 
     def test_get_messages(self):
         """Test getting message history"""
