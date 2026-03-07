@@ -347,9 +347,57 @@ const AdminDashboard = () => {
                                           <p className="text-xs">System Thinking</p>
                                         </div>
                                       </div>
-                                      <div className="mt-4">
-                                        <p><strong>Total:</strong> {selectedInterview.result.total_score}/40</p>
-                                        <p><strong>Recommendation:</strong> {selectedInterview.result.recommendation}</p>
+                                      <div className="mt-4 grid md:grid-cols-2 gap-4">
+                                        <div className="p-4 bg-slate-50 rounded">
+                                          <p className="text-sm text-slate-600">Total Score</p>
+                                          <p className="text-3xl font-bold text-slate-900">{selectedInterview.result.total_score}/40</p>
+                                        </div>
+                                        <div className="p-4 bg-slate-50 rounded">
+                                          <p className="text-sm text-slate-600">Recommendation</p>
+                                          <p className="text-lg font-semibold text-slate-900">{selectedInterview.result.recommendation}</p>
+                                        </div>
+                                      </div>
+                                      <div className="mt-4 space-y-2">
+                                        <div>
+                                          <p className="text-sm font-semibold text-slate-700">Strengths:</p>
+                                          <p className="text-sm text-slate-600">{selectedInterview.result.strengths}</p>
+                                        </div>
+                                        <div>
+                                          <p className="text-sm font-semibold text-slate-700">Weaknesses:</p>
+                                          <p className="text-sm text-slate-600">{selectedInterview.result.weaknesses}</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* Video Recordings */}
+                                  {selectedInterview.interview?.video_recordings && selectedInterview.interview.video_recordings.length > 0 && (
+                                    <div>
+                                      <h3 className="font-semibold mb-2 flex items-center gap-2">
+                                        <Video className="w-5 h-5" />
+                                        Video Recordings ({selectedInterview.interview.video_recordings.length} chunks)
+                                      </h3>
+                                      <div className="bg-slate-50 p-4 rounded">
+                                        <p className="text-sm text-slate-600 mb-2">
+                                          Interview video captured in {selectedInterview.interview.video_recordings.length} segments
+                                        </p>
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                          {selectedInterview.interview.video_recordings.slice(0, 6).map((chunk, idx) => (
+                                            <div key={idx} className="bg-slate-800 rounded p-2 text-center">
+                                              <Video className="w-8 h-8 text-slate-400 mx-auto mb-1" />
+                                              <p className="text-xs text-slate-300">Chunk {idx + 1}</p>
+                                              <p className="text-xs text-slate-400">{(chunk.length / 1024).toFixed(0)}KB</p>
+                                            </div>
+                                          ))}
+                                        </div>
+                                        {selectedInterview.interview.video_recordings.length > 6 && (
+                                          <p className="text-xs text-slate-500 mt-2 text-center">
+                                            + {selectedInterview.interview.video_recordings.length - 6} more chunks
+                                          </p>
+                                        )}
+                                        <p className="text-xs text-slate-500 mt-3">
+                                          Note: Video playback feature available in full version. Videos are stored securely.
+                                        </p>
                                       </div>
                                     </div>
                                   )}
