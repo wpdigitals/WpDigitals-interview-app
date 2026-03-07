@@ -17,7 +17,7 @@ const InterviewPage = () => {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [interview, setInterview] = useState(null);
-  const [timer, setTimer] = useState(120); // 2 minutes per question
+  const [timer, setTimer] = useState(300); // 5 minutes per question
   const [questionStartTime, setQuestionStartTime] = useState(null);
   const [inactivityTimer, setInactivityTimer] = useState(300); // 5 minutes = 300 seconds
   const [lastActivityTime, setLastActivityTime] = useState(Date.now());
