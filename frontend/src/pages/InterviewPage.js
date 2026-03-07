@@ -549,54 +549,56 @@ const InterviewPage = () => {
   return (
     <div data-testid="interview-page" className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200 px-6 py-4 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">Technical Interview</h1>
-            <p className="text-sm text-slate-600">Type your answers - pasting is disabled</p>
-          </div>
-          <div className="flex items-center gap-4">
-            {/* Timer */}
-            <div className={`flex items-center gap-2 px-4 py-2 rounded-full ${
-              isTimeUp ? 'bg-red-100 text-red-700' : 
-              isTimeLow ? 'bg-orange-100 text-orange-700' : 
-              'bg-slate-100 text-slate-700'
-            }`}>
-              <Clock className="w-4 h-4" />
-              <span className="font-mono font-bold">{formatTime(timer)}</span>
+      <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200 px-4 sm:px-6 py-4 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Technical Interview</h1>
+              <p className="text-xs sm:text-sm text-slate-600">Type your answers - pasting is disabled</p>
             </div>
-            
-            {/* Camera Status */}
-            <div className={`flex items-center gap-2 px-4 py-2 rounded-full ${
-              cameraActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-            }`}>
-              {cameraActive ? (
-                <>
-                  <Video className="w-4 h-4" />
-                  <span className="text-sm font-semibold">Recording</span>
-                </>
-              ) : (
-                <>
-                  <VideoOff className="w-4 h-4" />
-                  <span className="text-sm font-semibold">No Camera</span>
-                </>
-              )}
-            </div>
-            
-            {/* Stop Interview Button */}
-            <Button
-              onClick={handleStopInterview}
-              variant="destructive"
-              size="sm"
-              className="gap-2"
-            >
-              <StopCircle className="w-4 h-4" />
-              Stop Interview
-            </Button>
-            
-            {/* Phase Badge */}
-            <div className={`${phaseInfo.color} text-white px-4 py-2 rounded-full text-sm font-semibold`}>
-              {phaseInfo.name}
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+              {/* Timer */}
+              <div className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm ${
+                isTimeUp ? 'bg-red-100 text-red-700' : 
+                isTimeLow ? 'bg-orange-100 text-orange-700' : 
+                'bg-slate-100 text-slate-700'
+              }`}>
+                <Clock className="w-4 h-4" />
+                <span className="font-mono font-bold">{formatTime(timer)}</span>
+              </div>
+              
+              {/* Camera Status */}
+              <div className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm ${
+                cameraActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+              }`}>
+                {cameraActive ? (
+                  <>
+                    <Video className="w-4 h-4" />
+                    <span className="text-xs sm:text-sm font-semibold">Recording</span>
+                  </>
+                ) : (
+                  <>
+                    <VideoOff className="w-4 h-4" />
+                    <span className="text-xs sm:text-sm font-semibold">No Camera</span>
+                  </>
+                )}
+              </div>
+              
+              {/* Stop Interview Button */}
+              <Button
+                onClick={handleStopInterview}
+                variant="destructive"
+                size="sm"
+                className="gap-2 text-xs sm:text-sm"
+              >
+                <StopCircle className="w-4 h-4" />
+                <span className="hidden sm:inline">Stop</span>
+              </Button>
+              
+              {/* Phase Badge */}
+              <div className={`${phaseInfo.color} text-white px-3 py-2 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap`}>
+                {phaseInfo.name}
+              </div>
             </div>
           </div>
         </div>
