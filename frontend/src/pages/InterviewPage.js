@@ -386,6 +386,98 @@ const InterviewPage = () => {
     }
   };
 
+  const handleInactivityTermination = async () => {
+    if (loading || interview?.status !== 'active') return;
+    
+    toast.error('Interview terminated due to 5 minutes of inactivity');
+    
+    try {
+      await axios.post(`${API}/interviews/${interviewId}/message`, {
+        content: 'Terminated due to inactivity',
+        time_taken: 0,
+        is_timeout: true
+      }, { withCredentials: true });
+
+      stopRecording();
+      setTimeout(() => {
+        navigate(`/interview/${interviewId}/terminated`);
+      }, 2000);
+    } catch (error) {
+      console.error('Inactivity termination error:', error);
+    }
+  };
+
+  const handleSkipQuestion = async () => {
+    if (loading) return;
+    
+    setLastActivityTime(Date.now()); // Reset inactivity timer
+    
+    const timeTaken = questionStartTime ? Math.floor((Date.now() - questionStartTime) / 1000) : 0;
+    setLoading(true);
+
+    setMessages(prev => [...prev, {
+      role: 'user',
+      content: '(Question skipped)',
+      timestamp: new Date().toISOString()
+    }]);
+
+    try {
+      const res = await axios.post(`${API}/interviews/${interviewId}/message`, {
+        content: '',
+        time_taken: timeTaken,
+        is_timeout: true
+      }, { withCredentials: true });
+
+      if (res.data.status === 'terminated') {
+        stopRecording();
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: res.data.message,
+          timestamp: new Date().toISOString()
+        }]);
+        setInterview(prev => ({
+          ...prev,
+          status: 'terminated',
+          termination_reason: res.data.termination_reason
+        }));
+        toast.info('Interview has been terminated');
+        setTimeout(() => {
+          navigate(`/interview/${interviewId}/terminated`);
+        }, 2000);
+        return;
+      }
+
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: res.data.message,
+        timestamp: new Date().toISOString()
+      }]);
+
+      setInterview(prev => ({
+        ...prev,
+        phase: res.data.phase,
+        status: res.data.status
+      }));
+
+      setQuestionStartTime(Date.now());
+      setTimer(120);
+
+      if (res.data.status === 'completed') {
+        stopRecording();
+        toast.success('Interview completed! Generating evaluation...');
+        setTimeout(() => {
+          handleEvaluate();
+        }, 1000);
+      }
+    } catch (error) {
+      console.error('Failed to skip question:', error);
+      toast.error('Failed to skip question');
+      setMessages(prev => prev.slice(0, -1));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getPhaseInfo = () => {
     if (!interview) return { name: 'Loading...', color: 'bg-gray-500' };
     
