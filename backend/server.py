@@ -248,27 +248,49 @@ Ask ONE question at a time. After 2 questions, inform them the interview is comp
 def get_evaluation_prompt(messages: List[dict], candidate_data: dict) -> str:
     conversation = "\n".join([f"{m['role']}: {m['content']}" for m in messages])
     
-    return f"""You are evaluating a technical interview for a {candidate_data.get('role')} position.
+    return f"""You are an expert HR consultant and technical interviewer evaluating a candidate for {candidate_data.get('role')} position.
 
-Candidate: {candidate_data.get('name')}
-Experience: {candidate_data.get('experience')}
-Tech Stack: {candidate_data.get('tech_stack')}
+Candidate Profile:
+- Name: {candidate_data.get('name')}
+- Experience: {candidate_data.get('experience')}
+- Tech Stack: {candidate_data.get('tech_stack')}
 
-Interview Transcript:
+Complete Interview Transcript:
 {conversation}
 
-Provide a structured evaluation in EXACTLY this JSON format:
+Provide a COMPREHENSIVE evaluation in EXACTLY this JSON format:
+
 {{
   "communication_score": <number 1-10>,
   "technical_score": <number 1-10>,
   "problem_solving_score": <number 1-10>,
   "system_thinking_score": <number 1-10>,
-  "strengths": "<brief strengths>",
-  "weaknesses": "<brief weaknesses>",
-  "recommendation": "<Hire/Consider/Reject with brief reason>"
+  
+  "strengths": "<3-4 key strengths with examples>",
+  "weaknesses": "<3-4 areas for improvement with examples>",
+  "recommendation": "<Hire/Consider/Reject with detailed reasoning>",
+  
+  "behavior_analysis": "<Detailed analysis of communication style, confidence, professionalism, attitude, responsiveness>",
+  
+  "performance_review": "<Comprehensive review of technical performance, problem-solving approach, depth of knowledge, learning ability>",
+  
+  "swot_analysis": {{
+    "strengths": "<Internal positive attributes: technical skills, experience, knowledge>",
+    "weaknesses": "<Internal limitations: skill gaps, knowledge gaps, areas needing improvement>",
+    "opportunities": "<External factors for growth: learning potential, adaptability, growth mindset>",
+    "threats": "<External concerns: market competition, skill obsolescence risk, retention concerns>"
+  }},
+  
+  "long_term_potential": "<Assessment of candidate's potential for growth, leadership, long-term value to organization, career trajectory (3-5 sentences)>",
+  
+  "cultural_fit": "<Analysis of how well candidate aligns with team dynamics, company values, work style (2-3 sentences)>",
+  
+  "risk_assessment": "<Potential risks in hiring this candidate: retention risk, skill gaps, overqualification concerns (2-3 sentences)>",
+  
+  "development_plan": "<Suggested onboarding and development plan if hired: training needs, mentorship requirements, initial projects (3-4 points)>"
 }}
 
-Be objective and professional."""
+Be thorough, objective, and professional in your evaluation. Provide specific examples from the interview."""
 
 # Auth Routes
 @api_router.post("/auth/session")
