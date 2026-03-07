@@ -5,7 +5,7 @@ import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Textarea } from '../components/ui/textarea';
 import { toast } from 'sonner';
-import { Send, Loader2, CheckCircle, Video, VideoOff, Clock, AlertCircle } from 'lucide-react';
+import { Send, Loader2, CheckCircle, Video, VideoOff, Clock, AlertCircle, StopCircle, RotateCcw } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
