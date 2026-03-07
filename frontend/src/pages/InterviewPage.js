@@ -279,6 +279,8 @@ const InterviewPage = () => {
       return;
     }
 
+    setLastActivityTime(Date.now()); // Reset inactivity timer
+
     const userMessage = input;
     const timeTaken = questionStartTime ? Math.floor((Date.now() - questionStartTime) / 1000) : 0;
     setInput('');
