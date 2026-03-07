@@ -579,6 +579,21 @@ const InterviewPage = () => {
               </Card>
             )}
 
+            {/* Inactivity Warning */}
+            {inactivityTimer < 60 && inactivityTimer > 0 && interview?.status === 'active' && (
+              <Card className="border-orange-200 bg-orange-50 p-4">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-orange-600 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-orange-900">Inactivity Warning</p>
+                    <p className="text-sm text-orange-700">
+                      Interview will be terminated in {inactivityTimer} seconds due to inactivity. Please respond to continue.
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            )}
+
             {messages.map((msg, idx) => (
               <div
                 key={idx}
