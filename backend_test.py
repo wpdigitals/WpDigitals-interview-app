@@ -2,6 +2,7 @@ import requests
 import sys
 import time
 import json
+import subprocess
 from datetime import datetime
 
 class AIInterviewerAPITester:
@@ -11,6 +12,8 @@ class AIInterviewerAPITester:
         self.tests_passed = 0
         self.candidate_id = None
         self.interview_id = None
+        self.session_token = None
+        self.user_id = None
 
     def run_test(self, name, method, endpoint, expected_status, data=None, timeout=30):
         """Run a single API test"""
