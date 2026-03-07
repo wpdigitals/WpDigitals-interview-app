@@ -341,6 +341,30 @@ const InterviewPage = () => {
     }
   };
 
+  const handleStopInterview = async () => {
+    if (!window.confirm('Are you sure you want to stop the interview? You can request a re-interview from the admin.')) {
+      return;
+    }
+
+    try {
+      // Mark as terminated
+      await axios.post(`${API}/interviews/${interviewId}/message`, {
+        content: 'Interview stopped by candidate',
+        time_taken: 0,
+        is_timeout: true
+      }, { withCredentials: true });
+
+      stopRecording();
+      toast.success('Interview stopped. Redirecting...');
+      setTimeout(() => {
+        navigate(`/interview/${interviewId}/terminated`);
+      }, 1500);
+    } catch (error) {
+      console.error('Stop interview error:', error);
+      toast.error('Failed to stop interview');
+    }
+  };
+
   const getPhaseInfo = () => {
     if (!interview) return { name: 'Loading...', color: 'bg-gray-500' };
     
