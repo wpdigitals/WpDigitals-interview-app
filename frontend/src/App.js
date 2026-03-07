@@ -9,6 +9,7 @@ import RegistrationPart1 from './pages/RegistrationPart1';
 import RegistrationPart2 from './pages/RegistrationPart2';
 import RegistrationPart3 from './pages/RegistrationPart3';
 import InterviewPage from './pages/InterviewPage';
+import InterviewTerminated from './pages/InterviewTerminated';
 import ResultPage from './pages/ResultPage';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
@@ -31,6 +32,7 @@ function AppRouter() {
       <Route path="/register/step2" element={<RegistrationPart2 />} />
       <Route path="/register/step3" element={<RegistrationPart3 />} />
       <Route path="/interview/:interviewId" element={<InterviewPage />} />
+      <Route path="/interview/:interviewId/terminated" element={<InterviewTerminated />} />
       <Route path="/result/:interviewId" element={<ResultPage />} />
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin/dashboard" element={<AdminDashboard />} />
