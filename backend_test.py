@@ -409,18 +409,23 @@ def main():
             print(f"\n💥 Critical failure in {test_name}. Stopping tests.")
             return 1
     
-    # Test interview conversation flow
+    # Test interview conversation flow with time tracking
     messages = [
-        ("I'm ready to begin the interview. Let's start!", "Send Initial Message"),
-        ("I have strong communication skills and experience working in teams. I'm passionate about Android development.", "Send Behavioral Response"),
-        ("Kotlin is my primary language. I use MVVM architecture with Room for local storage and Retrofit for API calls.", "Send Technical Response"),
-        ("I would start by analyzing the requirements, then design the architecture with scalability in mind.", "Send Problem Solving Response"),
+        ("I'm ready to begin the interview. Let's start!", "Send Initial Message", 15),
+        ("I have strong communication skills and experience working in teams. I'm passionate about Android development.", "Send Behavioral Response", 45),
+        ("Kotlin is my primary language. I use MVVM architecture with Room for local storage and Retrofit for API calls.", "Send Technical Response", 60),
+        ("I would start by analyzing the requirements, then design the architecture with scalability in mind.", "Send Problem Solving Response", 90),
     ]
     
-    for message, test_name in messages:
-        if not tester.test_send_message(message, test_name):
+    for message, test_name, time_taken in messages:
+        if not tester.test_send_message(message, test_name, time_taken):
             print(f"\n⚠️  Message sending failed: {test_name}")
         time.sleep(2)  # Brief pause between messages
+    
+    # Test video upload functionality
+    print(f"\n📹 Testing Video Upload...")
+    if not tester.test_video_upload():
+        print("⚠️  Video upload failed")
     
     # Continue conversation to reach completion
     print(f"\n📝 Continuing conversation to complete interview...")
