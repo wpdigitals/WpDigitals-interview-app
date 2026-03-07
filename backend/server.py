@@ -349,6 +349,180 @@ async def logout(request: Request, session_token: Optional[str] = Cookie(None)):
     response.delete_cookie(key="session_token", path="/")
     return response
 
+# Admin Auth Routes
+@api_router.post("/admin/login")
+async def admin_login(credentials: AdminLogin):
+    # Simple admin authentication (in production, use proper password hashing)
+    # Default admin: admin@wpdigitals.com / WPDigitals@2024
+    if credentials.email == "admin@wpdigitals.com" and credentials.password == "WPDigitals@2024":
+        admin_id = "admin_wpdigitals"
+        
+        # Check if admin exists
+        admin = await db.admins.find_one({"admin_id": admin_id}, {"_id": 0})
+        if not admin:
+            admin_doc = {
+                "admin_id": admin_id,
+                "email": credentials.email,
+                "name": "WP Digitals Admin",
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.admins.insert_one(admin_doc)
+            admin = admin_doc
+        
+        # Create admin session
+        session_token = f"admin_session_{uuid.uuid4().hex}"
+        expires_at = datetime.now(timezone.utc) + timedelta(days=7)
+        
+        session_doc = {
+            "admin_id": admin_id,
+            "session_token": session_token,
+            "expires_at": expires_at.isoformat(),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.admin_sessions.insert_one(session_doc)
+        
+        response = JSONResponse(content={"admin": admin, "token": session_token})
+        response.set_cookie(
+            key="admin_token",
+            value=session_token,
+            httponly=True,
+            secure=True,
+            samesite="none",
+            path="/",
+            max_age=7*24*60*60
+        )
+        return response
+    else:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+@api_router.get("/admin/me")
+async def get_admin(admin_token: Optional[str] = Cookie(None)):
+    if not admin_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    session = await db.admin_sessions.find_one({"session_token": admin_token}, {"_id": 0})
+    if not session:
+        raise HTTPException(status_code=401, detail="Invalid session")
+    
+    expires_at = datetime.fromisoformat(session["expires_at"])
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+    
+    if expires_at < datetime.now(timezone.utc):
+        raise HTTPException(status_code=401, detail="Session expired")
+    
+    admin = await db.admins.find_one({"admin_id": session["admin_id"]}, {"_id": 0})
+    if not admin:
+        raise HTTPException(status_code=401, detail="Admin not found")
+    
+    return admin
+
+@api_router.post("/admin/logout")
+async def admin_logout(admin_token: Optional[str] = Cookie(None)):
+    if admin_token:
+        await db.admin_sessions.delete_one({"session_token": admin_token})
+    
+    response = JSONResponse(content={"message": "Logged out"})
+    response.delete_cookie(key="admin_token", path="/")
+    return response
+
+# Admin Management Routes
+@api_router.get("/admin/interviews")
+async def get_all_interviews(admin_token: Optional[str] = Cookie(None)):
+    # Verify admin
+    await get_admin(admin_token)
+    
+    # Get all interviews with candidate info
+    interviews = await db.interviews.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    
+    # Enrich with candidate data
+    for interview in interviews:
+        candidate = await db.candidates.find_one({"id": interview["candidate_id"]}, {"_id": 0})
+        if candidate:
+            interview["candidate"] = {
+                "name": candidate.get("name"),
+                "email": candidate.get("email"),
+                "role": candidate.get("role"),
+                "experience": candidate.get("experience")
+            }
+    
+    return interviews
+
+@api_router.get("/admin/interviews/{interview_id}/details")
+async def get_interview_details(interview_id: str, admin_token: Optional[str] = Cookie(None)):
+    # Verify admin
+    await get_admin(admin_token)
+    
+    # Get interview
+    interview = await db.interviews.find_one({"id": interview_id}, {"_id": 0})
+    if not interview:
+        raise HTTPException(status_code=404, detail="Interview not found")
+    
+    # Get candidate
+    candidate = await db.candidates.find_one({"id": interview["candidate_id"]}, {"_id": 0})
+    
+    # Get messages
+    messages = await db.messages.find(
+        {"interview_id": interview_id},
+        {"_id": 0}
+    ).sort("timestamp", 1).to_list(1000)
+    
+    # Get result if exists
+    result = await db.results.find_one({"interview_id": interview_id}, {"_id": 0})
+    
+    return {
+        "interview": interview,
+        "candidate": candidate,
+        "messages": messages,
+        "result": result
+    }
+
+@api_router.delete("/admin/interviews/{interview_id}")
+async def delete_interview(interview_id: str, admin_token: Optional[str] = Cookie(None)):
+    # Verify admin
+    await get_admin(admin_token)
+    
+    # Delete interview and related data
+    await db.interviews.delete_one({"id": interview_id})
+    await db.messages.delete_many({"interview_id": interview_id})
+    await db.results.delete_one({"interview_id": interview_id})
+    
+    return {"message": "Interview deleted successfully"}
+
+@api_router.post("/admin/send-invitation")
+async def send_interview_invitation(
+    invitation: dict,
+    admin_token: Optional[str] = Cookie(None)
+):
+    # Verify admin
+    await get_admin(admin_token)
+    
+    # In production, integrate with email service (SendGrid, etc.)
+    # For now, just log the invitation
+    email = invitation.get("email")
+    name = invitation.get("name")
+    meeting_date = invitation.get("meeting_date")
+    meeting_time = invitation.get("meeting_time")
+    
+    # Store invitation in database
+    invitation_doc = {
+        "id": str(uuid.uuid4()),
+        "email": email,
+        "name": name,
+        "meeting_date": meeting_date,
+        "meeting_time": meeting_time,
+        "sent_at": datetime.now(timezone.utc).isoformat(),
+        "status": "sent"
+    }
+    await db.invitations.insert_one(invitation_doc)
+    
+    # TODO: Send actual email using email service
+    # For now, return success
+    return {
+        "message": f"Interview invitation sent to {email}",
+        "invitation": invitation_doc
+    }
+
 # Resume Parsing
 @api_router.post("/resume/parse")
 async def parse_resume(file: UploadFile = File(...)):
