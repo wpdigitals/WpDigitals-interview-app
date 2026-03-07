@@ -911,7 +911,14 @@ async def evaluate_interview(interview_id: str):
         strengths=eval_data.get('strengths', ''),
         weaknesses=eval_data.get('weaknesses', ''),
         recommendation=eval_data.get('recommendation', ''),
-        expression_analysis="Analysis pending - video processing in progress"
+        behavior_analysis=eval_data.get('behavior_analysis', ''),
+        performance_review=eval_data.get('performance_review', ''),
+        swot_analysis=eval_data.get('swot_analysis', {}),
+        long_term_potential=eval_data.get('long_term_potential', ''),
+        cultural_fit=eval_data.get('cultural_fit', ''),
+        risk_assessment=eval_data.get('risk_assessment', ''),
+        development_plan=eval_data.get('development_plan', ''),
+        expression_analysis="Video expression analysis available - check video recordings"
     )
     
     await db.results.insert_one(result_obj.model_dump())
