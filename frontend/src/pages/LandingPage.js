@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Users, Clock, Award, CheckCircle, ArrowRight } from 'lucide-react';
 
-const LOGO_URL = 'https://customer-assets.emergentagent.com/job_code-screener/artifacts/fr7dkpe8_wp%20digitals%20logo.png';
+const LOGO_URL = 'https://customer-assets.emergentagent.com/job_code-screener/artifacts/79us4sj7_WP%20digitals%20logo%20new.png';
+const LOGO_WHITE_URL = 'https://customer-assets.emergentagent.com/job_code-screener/artifacts/vm43v6m6_WP%20digitals%20white.png';
 
 const LandingPage = () => {
   const navigate = useNavigate();
