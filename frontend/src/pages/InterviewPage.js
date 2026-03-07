@@ -531,21 +531,32 @@ const InterviewPage = () => {
         </div>
       )}
 
-      {/* Completed state */}
-      {interview?.status === 'completed' && (
+      {/* Completed or Terminated state */}
+      {(interview?.status === 'completed' || interview?.status === 'terminated') && (
         <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-t border-slate-200 p-6">
           <div className="max-w-7xl mx-auto text-center space-y-4">
-            <div className="flex items-center justify-center gap-2 text-green-600">
+            <div className={`flex items-center justify-center gap-2 ${interview.status === 'terminated' ? 'text-orange-600' : 'text-green-600'}`}>
               <CheckCircle className="w-6 h-6" />
-              <span className="font-semibold">Interview Completed!</span>
+              <span className="font-semibold">
+                {interview.status === 'terminated' 
+                  ? 'Interview Terminated - Thank you for your time!' 
+                  : 'Interview Completed!'}
+              </span>
             </div>
-            <Button
-              data-testid="view-results-btn"
-              onClick={handleEvaluate}
-              className="bg-indigo-600 hover:bg-indigo-700"
-            >
-              Generate Evaluation Report
-            </Button>
+            {interview.status === 'completed' && (
+              <Button
+                data-testid="view-results-btn"
+                onClick={handleEvaluate}
+                className="bg-indigo-600 hover:bg-indigo-700"
+              >
+                Generate Evaluation Report
+              </Button>
+            )}
+            {interview.status === 'terminated' && (
+              <p className="text-slate-600">
+                Our team will review your responses and contact you soon.
+              </p>
+            )}
           </div>
         </div>
       )}
