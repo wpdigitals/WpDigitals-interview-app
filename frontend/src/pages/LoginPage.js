@@ -19,7 +19,7 @@ const LoginPage = () => {
       <Card className="w-full max-w-md p-8 border-slate-200 shadow-xl">
         <div className="text-center space-y-6">
           <div className="flex items-center justify-center">
-            <img src={LOGO_URL} alt="WP Digitals" className="h-32 object-contain max-w-[500px]" />
+            <img src={LOGO_URL} alt="WP Digitals" className="h-16 object-contain max-w-[200px]" />
           </div>
           
           <div className="space-y-2">
