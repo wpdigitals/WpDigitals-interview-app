@@ -387,7 +387,7 @@ async def evaluate_interview(interview_id: str):
             eval_response = eval_response.split("```")[1].split("```")[0]
         
         eval_data = json.loads(eval_response)
-    except:
+    except (json.JSONDecodeError, KeyError, IndexError):
         eval_data = {
             "communication_score": 7,
             "technical_score": 7,
