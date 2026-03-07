@@ -515,6 +515,32 @@ async def send_message(interview_id: str, message: MessageCreate):
     
     current_phase = interview['phase']
     current_q = interview['current_question'] + 1
+    unanswered_count = interview.get('unanswered_count', 0)
+    
+    # Check if answer is empty or timeout (unanswered)
+    if not message.content.strip() or message.is_timeout:
+        unanswered_count += 1
+    else:
+        unanswered_count = 0  # Reset if they answered
+    
+    # Check if 5 consecutive unanswered questions
+    if unanswered_count >= 5:
+        update_data = {
+            "status": "terminated",
+            "termination_reason": "5 consecutive unanswered questions",
+            "unanswered_count": unanswered_count
+        }
+        await db.interviews.update_one(
+            {"id": interview_id},
+            {"$set": update_data}
+        )
+        return {
+            "message": "Thank you for your time. We appreciate your interest in the position. Our team will review your responses and get back to you soon. Have a great day!",
+            "phase": current_phase,
+            "status": "terminated",
+            "termination_reason": "Interview terminated due to inactivity",
+            "question_number": current_q
+        }
     
     new_phase = current_phase
     phase_limits = {"init": 1, "phase1": 10, "phase2": 20, "phase3": 2}
@@ -538,7 +564,7 @@ async def send_message(interview_id: str, message: MessageCreate):
         system_message=system_msg
     ).with_model("openai", "gpt-5.2")
     
-    user_msg = UserMessage(text=message.content)
+    user_msg = UserMessage(text=message.content if message.content.strip() else "No answer provided")
     response = await chat.send_message(user_msg)
     
     assistant_message = InterviewMessage(
@@ -550,7 +576,8 @@ async def send_message(interview_id: str, message: MessageCreate):
     
     update_data = {
         "phase": new_phase,
-        "current_question": current_q
+        "current_question": current_q,
+        "unanswered_count": unanswered_count
     }
     
     if new_phase == "completed":
@@ -565,7 +592,8 @@ async def send_message(interview_id: str, message: MessageCreate):
         "message": response,
         "phase": new_phase,
         "status": update_data.get("status", "active"),
-        "question_number": current_q
+        "question_number": current_q,
+        "unanswered_count": unanswered_count
     }
 
 @api_router.post("/interviews/{interview_id}/video")
