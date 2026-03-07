@@ -268,8 +268,26 @@ const InterviewPage = () => {
     try {
       const res = await axios.post(`${API}/interviews/${interviewId}/message`, {
         content: userMessage,
-        time_taken: timeTaken
+        time_taken: timeTaken,
+        is_timeout: false
       }, { withCredentials: true });
+
+      // Check if interview was terminated
+      if (res.data.status === 'terminated') {
+        stopRecording();
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: res.data.message,
+          timestamp: new Date().toISOString()
+        }]);
+        setInterview(prev => ({
+          ...prev,
+          status: 'terminated',
+          termination_reason: res.data.termination_reason
+        }));
+        toast.info('Interview has been terminated');
+        return;
+      }
 
       setMessages(prev => [...prev, {
         role: 'assistant',
