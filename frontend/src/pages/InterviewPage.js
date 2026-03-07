@@ -36,9 +36,9 @@ const InterviewPage = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Timer countdown
+  // Timer countdown with auto-submit
   useEffect(() => {
-    if (!questionStartTime || interview?.status === 'completed') return;
+    if (!questionStartTime || interview?.status === 'completed' || interview?.status === 'terminated') return;
 
     const interval = setInterval(() => {
       const elapsed = Math.floor((Date.now() - questionStartTime) / 1000);
@@ -46,14 +46,17 @@ const InterviewPage = () => {
       
       if (remaining <= 0) {
         setTimer(0);
-        toast.warning('Time is up for this question!');
+        // Auto-submit empty answer when time runs out
+        if (!loading) {
+          handleTimeoutSubmit();
+        }
       } else {
         setTimer(remaining);
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [questionStartTime, interview?.status]);
+  }, [questionStartTime, interview?.status, loading]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
