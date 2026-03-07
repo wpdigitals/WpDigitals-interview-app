@@ -23,6 +23,7 @@ const InterviewPage = () => {
   const [lastActivityTime, setLastActivityTime] = useState(Date.now());
   const [cameraActive, setCameraActive] = useState(false);
   const [recordingStream, setRecordingStream] = useState(null);
+  const [beepPlayed, setBeepPlayed] = useState(false);
   const messagesEndRef = useRef(null);
   const videoRef = useRef(null);
   const mediaRecorderRef = useRef(null);
