@@ -502,7 +502,7 @@ const InterviewPage = () => {
       }));
 
       setQuestionStartTime(Date.now());
-      setTimer(120);
+      setTimer(300); // 5 minutes
       setBeepPlayed(false); // Reset beep flag
 
       if (res.data.status === 'completed') {
