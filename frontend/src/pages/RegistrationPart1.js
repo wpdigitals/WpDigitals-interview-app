@@ -201,7 +201,7 @@ const RegistrationPart1 = () => {
         {/* Benefits */}
         <div className="mt-8 grid md:grid-cols-3 gap-4">
           <div className="bg-white/70 backdrop-blur-sm p-4 rounded-lg border border-slate-200">
-            <p className="text-sm font-semibold text-slate-900 mb-1">✨ AI-Powered</p>
+            <p className="text-sm font-semibold text-slate-900 mb-1">✨ Smart Parsing</p>
             <p className="text-xs text-slate-600">Automatically extracts all your details</p>
           </div>
           <div className="bg-white/70 backdrop-blur-sm p-4 rounded-lg border border-slate-200">
