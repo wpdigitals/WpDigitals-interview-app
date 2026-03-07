@@ -105,6 +105,7 @@ class Interview(BaseModel):
 class MessageCreate(BaseModel):
     content: str
     time_taken: Optional[int] = None  # seconds
+    is_timeout: Optional[bool] = False  # True if submitted due to timeout
 
 class InterviewMessage(BaseModel):
     model_config = ConfigDict(extra="ignore")
