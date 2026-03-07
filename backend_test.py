@@ -168,14 +168,24 @@ Education: B.Tech Computer Science
         return success
 
     def test_create_candidate(self):
-        """Test candidate creation"""
+        """Test candidate creation with new fields"""
+        if not self.user_id:
+            print("❌ Cannot create candidate - no user ID")
+            return False
+            
         candidate_data = {
+            "user_id": self.user_id,
             "name": "Test Candidate",
             "email": "test@example.com",
             "whatsapp": "+91 9876543210",
             "role": "Android Developer",
             "experience": "2 years",
             "tech_stack": "Kotlin, Java, Android SDK, Room, Retrofit",
+            "address": "123 Tech Street, Bangalore, Karnataka, India",
+            "linkedin": "https://linkedin.com/in/testcandidate",
+            "github": "https://github.com/testcandidate",
+            "twitter": "https://twitter.com/testcandidate",
+            "portfolio": "https://testcandidate.dev",
             "kyc_aadhar": "1234 5678 9012",
             "kyc_pan": "ABCDE1234F"
         }
