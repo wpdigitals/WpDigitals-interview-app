@@ -15,10 +15,14 @@ class AIInterviewerAPITester:
         self.session_token = None
         self.user_id = None
 
-    def run_test(self, name, method, endpoint, expected_status, data=None, timeout=30):
+    def run_test(self, name, method, endpoint, expected_status, data=None, timeout=30, files=None):
         """Run a single API test"""
         url = f"{self.base_url}/{endpoint}"
         headers = {'Content-Type': 'application/json'}
+        
+        # Add auth header if we have a session token
+        if self.session_token:
+            headers['Authorization'] = f'Bearer {self.session_token}'
 
         self.tests_run += 1
         print(f"\n🔍 Testing {name}...")
@@ -28,7 +32,12 @@ class AIInterviewerAPITester:
             if method == 'GET':
                 response = requests.get(url, headers=headers, timeout=timeout)
             elif method == 'POST':
-                response = requests.post(url, json=data, headers=headers, timeout=timeout)
+                if files:
+                    # Remove Content-Type for file uploads
+                    headers.pop('Content-Type', None)
+                    response = requests.post(url, data=data, files=files, headers=headers, timeout=timeout)
+                else:
+                    response = requests.post(url, json=data, headers=headers, timeout=timeout)
 
             print(f"   Status Code: {response.status_code}")
             
