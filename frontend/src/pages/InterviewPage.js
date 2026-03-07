@@ -341,7 +341,8 @@ const InterviewPage = () => {
       'phase1': { name: 'Phase 1: Behavioral', color: 'bg-green-500' },
       'phase2': { name: 'Phase 2: Technical', color: 'bg-purple-500' },
       'phase3': { name: 'Phase 3: Practical', color: 'bg-orange-500' },
-      'completed': { name: 'Completed', color: 'bg-gray-500' }
+      'completed': { name: 'Completed', color: 'bg-gray-500' },
+      'terminated': { name: 'Terminated', color: 'bg-red-500' }
     };
     
     return phaseMap[interview.phase] || { name: 'Unknown', color: 'bg-gray-500' };
