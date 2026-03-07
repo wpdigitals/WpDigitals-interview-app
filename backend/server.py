@@ -342,12 +342,39 @@ async def parse_resume(file: UploadFile = File(...)):
         content = await file.read()
         
         # Extract text based on file type
+        resume_text = ""
+        
         if file.filename.endswith('.pdf'):
-            # For PDF, we'll use base64 and let AI extract
-            resume_text = f"[PDF Content - {len(content)} bytes]"
-        else:
-            # For text files
+            # Parse PDF
+            import PyPDF2
+            import io
+            pdf_file = io.BytesIO(content)
+            pdf_reader = PyPDF2.PdfReader(pdf_file)
+            for page in pdf_reader.pages:
+                resume_text += page.extract_text() + "\n"
+        
+        elif file.filename.endswith('.docx'):
+            # Parse DOCX
+            import docx
+            import io
+            doc_file = io.BytesIO(content)
+            doc = docx.Document(doc_file)
+            for para in doc.paragraphs:
+                resume_text += para.text + "\n"
+        
+        elif file.filename.endswith('.txt'):
+            # Parse text file
             resume_text = content.decode('utf-8')
+        
+        else:
+            # Try to decode as text
+            try:
+                resume_text = content.decode('utf-8')
+            except:
+                resume_text = f"[Unsupported format: {file.filename}]"
+        
+        if not resume_text.strip():
+            raise HTTPException(status_code=400, detail="Could not extract text from file")
         
         # Use AI to parse resume
         chat = LlmChat(
