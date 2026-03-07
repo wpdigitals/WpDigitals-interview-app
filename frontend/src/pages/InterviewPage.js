@@ -38,6 +38,25 @@ const InterviewPage = () => {
     scrollToBottom();
   }, [messages]);
 
+  // 5-minute inactivity timer
+  useEffect(() => {
+    if (interview?.status === 'completed' || interview?.status === 'terminated') return;
+
+    const interval = setInterval(() => {
+      const inactive = Math.floor((Date.now() - lastActivityTime) / 1000);
+      const remaining = 300 - inactive;
+      
+      if (remaining <= 0) {
+        setInactivityTimer(0);
+        handleInactivityTermination();
+      } else {
+        setInactivityTimer(remaining);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [lastActivityTime, interview?.status]);
+
   // Timer countdown with auto-submit
   useEffect(() => {
     if (!questionStartTime || interview?.status === 'completed' || interview?.status === 'terminated') return;
