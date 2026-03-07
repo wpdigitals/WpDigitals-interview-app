@@ -93,10 +93,12 @@ class Interview(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     candidate_id: str
     session_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    phase: str = "init"  # init, phase1, phase2, phase3, completed
+    phase: str = "init"  # init, phase1, phase2, phase3, completed, terminated
     current_question: int = 0
     total_questions: int = 0
-    status: str = "active"  # active, completed
+    unanswered_count: int = 0  # Track consecutive unanswered questions
+    status: str = "active"  # active, completed, terminated
+    termination_reason: Optional[str] = None
     video_recordings: List[str] = []  # URLs or base64 of video chunks
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
