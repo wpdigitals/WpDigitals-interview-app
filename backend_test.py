@@ -381,6 +381,21 @@ def main():
     
     tester = AIInterviewerAPITester()
     
+    # Setup authentication first
+    if not tester.setup_test_user():
+        print("💥 Failed to setup test user. Stopping tests.")
+        return 1
+    
+    # Test authentication
+    if not tester.test_auth_me():
+        print("💥 Authentication failed. Stopping tests.")
+        return 1
+    
+    # Test new features
+    print("\n📋 Testing New Features...")
+    if not tester.test_resume_parse():
+        print("⚠️  Resume parsing failed")
+    
     # Test sequence
     tests = [
         ("Root Endpoint", tester.test_root_endpoint),
