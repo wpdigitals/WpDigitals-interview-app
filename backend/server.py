@@ -223,9 +223,16 @@ After 10 questions, inform them Phase 1 is complete."""
     elif phase == "phase2":
         tech_focus = "Android architecture, Kotlin, API integration, State management, Database, Automation, AI tools, AWS" if "android" in role.lower() else tech_stack
         return base_msg + f"""\nPHASE 2: Technical Questions
-Ask 20 technical questions focused on: {tech_focus}
+Ask 20 UNIQUE technical questions focused on: {tech_focus}
 
-Ask ONE question at a time. After 20 questions, inform them Phase 2 is complete."""
+IMPORTANT:
+- Ask ONE question at a time
+- NEVER repeat questions already asked
+- Check conversation history to avoid duplicates
+- Each question should assess a different technical concept
+- Progress from basic to advanced topics
+
+After 20 questions, inform them Phase 2 is complete."""
     
     elif phase == "phase3":
         return base_msg + """\nPHASE 3: Practical Thinking (Final Phase)
