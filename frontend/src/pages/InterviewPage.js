@@ -495,7 +495,7 @@ const InterviewPage = () => {
       </div>
 
       {/* Input Area */}
-      {interview?.status !== 'completed' && (
+      {interview?.status !== 'completed' && interview?.status !== 'terminated' && (
         <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-t border-slate-200 p-6">
           <div className="max-w-7xl mx-auto">
             <div className="flex gap-3">
