@@ -68,17 +68,28 @@ const InterviewPage = () => {
       
       if (remaining <= 0) {
         setTimer(0);
-        // Auto-submit empty answer when time runs out
+        // Auto-submit with current typed message when time runs out
         if (!loading) {
-          handleTimeoutSubmit();
+          handleTimeoutSubmit(true); // true = use current input
         }
       } else {
         setTimer(remaining);
+        
+        // Play beep in last 20 seconds
+        if (remaining <= 20 && remaining > 0 && !beepPlayed) {
+          playBeep();
+          setBeepPlayed(true);
+        }
+        
+        // Reset beep flag when timer resets (new question)
+        if (remaining > 20) {
+          setBeepPlayed(false);
+        }
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [questionStartTime, interview?.status, loading]);
+  }, [questionStartTime, interview?.status, loading, beepPlayed]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
