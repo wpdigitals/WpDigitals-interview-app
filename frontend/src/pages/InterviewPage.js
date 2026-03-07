@@ -180,6 +180,73 @@ const InterviewPage = () => {
     toast.error('Pasting is disabled during the interview');
   };
 
+  const handleTimeoutSubmit = async () => {
+    const timeTaken = questionStartTime ? Math.floor((Date.now() - questionStartTime) / 1000) : 120;
+    setLoading(true);
+
+    // Add empty user message to UI
+    setMessages(prev => [...prev, {
+      role: 'user',
+      content: '(No answer provided - Time expired)',
+      timestamp: new Date().toISOString()
+    }]);
+
+    try {
+      const res = await axios.post(`${API}/interviews/${interviewId}/message`, {
+        content: '',
+        time_taken: timeTaken,
+        is_timeout: true
+      }, { withCredentials: true });
+
+      // Check if interview was terminated
+      if (res.data.status === 'terminated') {
+        stopRecording();
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: res.data.message,
+          timestamp: new Date().toISOString()
+        }]);
+        setInterview(prev => ({
+          ...prev,
+          status: 'terminated',
+          termination_reason: res.data.termination_reason
+        }));
+        toast.info('Interview has been terminated');
+        return;
+      }
+
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: res.data.message,
+        timestamp: new Date().toISOString()
+      }]);
+
+      setInterview(prev => ({
+        ...prev,
+        phase: res.data.phase,
+        status: res.data.status
+      }));
+
+      // Reset timer for new question
+      setQuestionStartTime(Date.now());
+      setTimer(120);
+
+      if (res.data.status === 'completed') {
+        stopRecording();
+        toast.success('Interview completed! Generating evaluation...');
+        setTimeout(() => {
+          handleEvaluate();
+        }, 1000);
+      }
+    } catch (error) {
+      console.error('Failed to submit timeout:', error);
+      toast.error('Failed to proceed to next question');
+      setMessages(prev => prev.slice(0, -1));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
     if (!cameraActive) {
