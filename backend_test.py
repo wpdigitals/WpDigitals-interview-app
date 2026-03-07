@@ -231,8 +231,8 @@ Education: B.Tech Computer Science
             return True
         return False
 
-    def test_send_message(self, message_content, test_name):
-        """Test sending a message in the interview"""
+    def test_send_message(self, message_content, test_name, time_taken=None):
+        """Test sending a message in the interview with time tracking"""
         if not self.interview_id:
             print("❌ Cannot send message - no interview ID")
             return False
@@ -240,6 +240,10 @@ Education: B.Tech Computer Science
         message_data = {
             "content": message_content
         }
+        
+        # Add time_taken if provided (simulating timer functionality)
+        if time_taken is not None:
+            message_data["time_taken"] = time_taken
         
         success, response = self.run_test(
             test_name,
