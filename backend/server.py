@@ -1,4 +1,5 @@
-from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Form
+from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Form, Cookie, Request
+from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -8,10 +9,12 @@ from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict, EmailStr
 from typing import List, Optional, Dict, Any
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 import base64
 import asyncio
+import httpx
+import json
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -27,28 +30,57 @@ app = FastAPI()
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
-# Models
+# Auth Models
+class User(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    user_id: str
+    email: str
+    name: str
+    picture: Optional[str] = None
+    created_at: str
+
+class UserSession(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    user_id: str
+    session_token: str
+    expires_at: str
+    created_at: str
+
+# Candidate Models
 class CandidateCreate(BaseModel):
+    user_id: str
     name: str
     email: EmailStr
     whatsapp: str
     role: str
     experience: str
     tech_stack: str
+    address: Optional[str] = None
+    linkedin: Optional[str] = None
+    github: Optional[str] = None
+    twitter: Optional[str] = None
+    portfolio: Optional[str] = None
     kyc_aadhar: Optional[str] = None
     kyc_pan: Optional[str] = None
 
 class Candidate(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
     name: str
     email: str
     whatsapp: str
     role: str
     experience: str
     tech_stack: str
+    address: Optional[str] = None
+    linkedin: Optional[str] = None
+    github: Optional[str] = None
+    twitter: Optional[str] = None
+    portfolio: Optional[str] = None
     kyc_aadhar: Optional[str] = None
     kyc_pan: Optional[str] = None
+    resume_text: Optional[str] = None
     aadhar_document: Optional[str] = None
     pan_document: Optional[str] = None
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
@@ -65,10 +97,12 @@ class Interview(BaseModel):
     current_question: int = 0
     total_questions: int = 0
     status: str = "active"  # active, completed
+    video_recordings: List[str] = []  # URLs or base64 of video chunks
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 class MessageCreate(BaseModel):
     content: str
+    time_taken: Optional[int] = None  # seconds
 
 class InterviewMessage(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -76,6 +110,7 @@ class InterviewMessage(BaseModel):
     interview_id: str
     role: str  # user, assistant, system
     content: str
+    time_taken: Optional[int] = None
     timestamp: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 class InterviewResult(BaseModel):
@@ -87,11 +122,50 @@ class InterviewResult(BaseModel):
     technical_score: int
     problem_solving_score: int
     system_thinking_score: int
+    expression_analysis: Optional[str] = None
     total_score: int
     strengths: str
     weaknesses: str
     recommendation: str
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class ResumeParseRequest(BaseModel):
+    resume_text: str
+
+# Helper: Get user from session token
+async def get_current_user(request: Request, session_token: Optional[str] = Cookie(None)) -> User:
+    # Check cookie first, then Authorization header
+    token = session_token
+    if not token:
+        auth_header = request.headers.get('Authorization')
+        if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header.replace('Bearer ', '')
+    
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    # Get session from database
+    session_doc = await db.user_sessions.find_one({"session_token": token}, {"_id": 0})
+    if not session_doc:
+        raise HTTPException(status_code=401, detail="Invalid session")
+    
+    # Check expiry
+    expires_at = session_doc["expires_at"]
+    if isinstance(expires_at, str):
+        expires_at = datetime.fromisoformat(expires_at)
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+    
+    if expires_at < datetime.now(timezone.utc):
+        await db.user_sessions.delete_one({"session_token": token})
+        raise HTTPException(status_code=401, detail="Session expired")
+    
+    # Get user
+    user_doc = await db.users.find_one({"user_id": session_doc["user_id"]}, {"_id": 0})
+    if not user_doc:
+        raise HTTPException(status_code=401, detail="User not found")
+    
+    return User(**user_doc)
 
 # Helper function to get system message based on phase
 def get_system_message(phase: str, candidate_data: dict) -> str:
@@ -104,6 +178,8 @@ Candidate Details:
 - Role: {role}
 - Experience: {experience}
 - Tech Stack: {tech_stack}
+
+IMPORTANT: Ask only ONE question at a time and wait for response. Do NOT provide answers or hints.
 """
     
     if phase == "init":
@@ -122,19 +198,14 @@ Ask 10 questions to evaluate:
 - Attitude and cultural fit
 - Learning ability and growth mindset
 
-Ask ONE question at a time. Wait for the candidate's response before proceeding.
-Do NOT provide answers. Be professional and encouraging.
-After 10 questions, inform the candidate that Phase 1 is complete and Phase 2 will begin."""
+Ask ONE question at a time. After 10 questions, inform them Phase 1 is complete."""
     
     elif phase == "phase2":
         tech_focus = "Android architecture, Kotlin, API integration, State management, Database, Automation, AI tools, AWS" if "android" in role.lower() else tech_stack
         return base_msg + f"""\nPHASE 2: Technical Questions
 Ask 20 technical questions focused on: {tech_focus}
 
-Ask ONE question at a time. Wait for the candidate's response.
-Evaluate their technical depth and practical knowledge.
-Do NOT provide answers or hints.
-After 20 questions, inform the candidate that Phase 2 is complete and Phase 3 (final phase) will begin."""
+Ask ONE question at a time. After 20 questions, inform them Phase 2 is complete."""
     
     elif phase == "phase3":
         return base_msg + """\nPHASE 3: Practical Thinking (Final Phase)
@@ -143,12 +214,7 @@ Ask 2 scenario-based questions to test:
 - Problem-solving approach
 - Practical application of knowledge
 
-Examples:
-- How would you design a scalable mobile app?
-- How would you debug a critical production issue?
-
-Ask ONE question at a time. Wait for detailed responses.
-After 2 questions, inform the candidate that the interview is complete and results will be generated."""
+Ask ONE question at a time. After 2 questions, inform them the interview is complete."""
     
     return base_msg
 
@@ -175,9 +241,156 @@ Provide a structured evaluation in EXACTLY this JSON format:
   "recommendation": "<Hire/Consider/Reject with brief reason>"
 }}
 
-Be objective and professional in your evaluation."""
+Be objective and professional."""
 
-# Routes
+# Auth Routes
+@api_router.post("/auth/session")
+async def create_session(request: Request):
+    body = await request.json()
+    session_id = body.get('session_id')
+    
+    if not session_id:
+        raise HTTPException(status_code=400, detail="session_id required")
+    
+    # REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
+    # Call Emergent Auth to get user data
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(
+                "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
+                headers={"X-Session-ID": session_id},
+                timeout=10.0
+            )
+            
+            if response.status_code != 200:
+                raise HTTPException(status_code=400, detail="Invalid session_id")
+            
+            data = response.json()
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Auth service error: {str(e)}")
+    
+    # Create or update user
+    user_id = f"user_{uuid.uuid4().hex[:12]}"
+    existing_user = await db.users.find_one({"email": data['email']}, {"_id": 0})
+    
+    if existing_user:
+        user_id = existing_user['user_id']
+        await db.users.update_one(
+            {"user_id": user_id},
+            {"$set": {
+                "name": data['name'],
+                "picture": data.get('picture')
+            }}
+        )
+    else:
+        user_doc = {
+            "user_id": user_id,
+            "email": data['email'],
+            "name": data['name'],
+            "picture": data.get('picture'),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.users.insert_one(user_doc)
+    
+    # Create session
+    session_token = data['session_token']
+    expires_at = datetime.now(timezone.utc) + timedelta(days=7)
+    
+    session_doc = {
+        "user_id": user_id,
+        "session_token": session_token,
+        "expires_at": expires_at.isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.user_sessions.insert_one(session_doc)
+    
+    # Get user data
+    user = await db.users.find_one({"user_id": user_id}, {"_id": 0})
+    
+    # Set cookie
+    response = JSONResponse(content=User(**user).model_dump())
+    response.set_cookie(
+        key="session_token",
+        value=session_token,
+        httponly=True,
+        secure=True,
+        samesite="none",
+        path="/",
+        max_age=7*24*60*60
+    )
+    
+    return response
+
+@api_router.get("/auth/me")
+async def get_me(request: Request, session_token: Optional[str] = Cookie(None)):
+    user = await get_current_user(request, session_token)
+    return user
+
+@api_router.post("/auth/logout")
+async def logout(request: Request, session_token: Optional[str] = Cookie(None)):
+    if session_token:
+        await db.user_sessions.delete_one({"session_token": session_token})
+    
+    response = JSONResponse(content={"message": "Logged out"})
+    response.delete_cookie(key="session_token", path="/")
+    return response
+
+# Resume Parsing
+@api_router.post("/resume/parse")
+async def parse_resume(file: UploadFile = File(...)):
+    try:
+        content = await file.read()
+        
+        # Extract text based on file type
+        if file.filename.endswith('.pdf'):
+            # For PDF, we'll use base64 and let AI extract
+            resume_text = f"[PDF Content - {len(content)} bytes]"
+        else:
+            # For text files
+            resume_text = content.decode('utf-8')
+        
+        # Use AI to parse resume
+        chat = LlmChat(
+            api_key=os.environ['EMERGENT_LLM_KEY'],
+            session_id=f"resume-parse-{uuid.uuid4()}",
+            system_message="""You are a resume parser. Extract structured information from resumes.
+Return ONLY valid JSON with these fields:
+{
+  "name": "full name",
+  "email": "email address",
+  "phone": "phone number",
+  "role": "job title/role",
+  "experience": "years of experience",
+  "tech_stack": "comma-separated skills",
+  "address": "full address if available",
+  "linkedin": "LinkedIn URL if available",
+  "github": "GitHub URL if available",
+  "twitter": "Twitter URL if available",
+  "portfolio": "Portfolio URL if available"
+}
+If a field is not found, use empty string."""
+        ).with_model("openai", "gpt-5.2")
+        
+        msg = UserMessage(text=f"Parse this resume:\n\n{resume_text}")
+        response = await chat.send_message(msg)
+        
+        # Parse JSON response
+        try:
+            if "```json" in response:
+                response = response.split("```json")[1].split("```")[0]
+            elif "```" in response:
+                response = response.split("```")[1].split("```")[0]
+            
+            parsed_data = json.loads(response.strip())
+            parsed_data['resume_text'] = resume_text
+            return parsed_data
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=500, detail="Failed to parse resume")
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error parsing resume: {str(e)}")
+
+# Candidate Routes
 @api_router.get("/")
 async def root():
     return {"message": "AI Technical Interviewer API"}
@@ -214,19 +427,17 @@ async def upload_documents(
     
     return {"message": "Documents uploaded successfully"}
 
+# Interview Routes
 @api_router.post("/interviews/start", response_model=Interview)
 async def start_interview(interview_data: InterviewCreate):
-    # Check if candidate exists
     candidate = await db.candidates.find_one({"id": interview_data.candidate_id}, {"_id": 0})
     if not candidate:
         raise HTTPException(status_code=404, detail="Candidate not found")
     
-    # Create interview
     interview_obj = Interview(candidate_id=interview_data.candidate_id)
     doc = interview_obj.model_dump()
     await db.interviews.insert_one(doc)
     
-    # Initialize chat with greeting
     system_msg = get_system_message("init", candidate)
     chat = LlmChat(
         api_key=os.environ['EMERGENT_LLM_KEY'],
@@ -234,11 +445,9 @@ async def start_interview(interview_data: InterviewCreate):
         system_message=system_msg
     ).with_model("openai", "gpt-5.2")
     
-    # Get initial greeting
     user_msg = UserMessage(text="Start the interview")
     greeting = await chat.send_message(user_msg)
     
-    # Store system message
     system_message = InterviewMessage(
         interview_id=interview_obj.id,
         role="system",
@@ -246,7 +455,6 @@ async def start_interview(interview_data: InterviewCreate):
     )
     await db.messages.insert_one(system_message.model_dump())
     
-    # Store greeting
     assistant_message = InterviewMessage(
         interview_id=interview_obj.id,
         role="assistant",
@@ -258,7 +466,6 @@ async def start_interview(interview_data: InterviewCreate):
 
 @api_router.post("/interviews/{interview_id}/message")
 async def send_message(interview_id: str, message: MessageCreate):
-    # Get interview
     interview = await db.interviews.find_one({"id": interview_id}, {"_id": 0})
     if not interview:
         raise HTTPException(status_code=404, detail="Interview not found")
@@ -266,18 +473,16 @@ async def send_message(interview_id: str, message: MessageCreate):
     if interview['status'] == 'completed':
         raise HTTPException(status_code=400, detail="Interview already completed")
     
-    # Get candidate
     candidate = await db.candidates.find_one({"id": interview['candidate_id']}, {"_id": 0})
     
-    # Store user message
     user_message = InterviewMessage(
         interview_id=interview_id,
         role="user",
-        content=message.content
+        content=message.content,
+        time_taken=message.time_taken
     )
     await db.messages.insert_one(user_message.model_dump())
     
-    # Update question count and phase if needed
     current_phase = interview['phase']
     current_q = interview['current_question'] + 1
     
@@ -296,7 +501,6 @@ async def send_message(interview_id: str, message: MessageCreate):
     elif current_phase == "phase3" and current_q >= phase_limits["phase3"]:
         new_phase = "completed"
     
-    # Get chat response
     system_msg = get_system_message(new_phase, candidate)
     chat = LlmChat(
         api_key=os.environ['EMERGENT_LLM_KEY'],
@@ -307,7 +511,6 @@ async def send_message(interview_id: str, message: MessageCreate):
     user_msg = UserMessage(text=message.content)
     response = await chat.send_message(user_msg)
     
-    # Store assistant response
     assistant_message = InterviewMessage(
         interview_id=interview_id,
         role="assistant",
@@ -315,7 +518,6 @@ async def send_message(interview_id: str, message: MessageCreate):
     )
     await db.messages.insert_one(assistant_message.model_dump())
     
-    # Update interview
     update_data = {
         "phase": new_phase,
         "current_question": current_q
@@ -336,6 +538,22 @@ async def send_message(interview_id: str, message: MessageCreate):
         "question_number": current_q
     }
 
+@api_router.post("/interviews/{interview_id}/video")
+async def upload_video_chunk(interview_id: str, video: UploadFile = File(...)):
+    interview = await db.interviews.find_one({"id": interview_id}, {"_id": 0})
+    if not interview:
+        raise HTTPException(status_code=404, detail="Interview not found")
+    
+    content = await video.read()
+    video_b64 = base64.b64encode(content).decode('utf-8')
+    
+    await db.interviews.update_one(
+        {"id": interview_id},
+        {"$push": {"video_recordings": video_b64}}
+    )
+    
+    return {"message": "Video chunk uploaded"}
+
 @api_router.get("/interviews/{interview_id}/messages")
 async def get_messages(interview_id: str):
     messages = await db.messages.find(
@@ -346,26 +564,21 @@ async def get_messages(interview_id: str):
 
 @api_router.post("/interviews/{interview_id}/evaluate", response_model=InterviewResult)
 async def evaluate_interview(interview_id: str):
-    # Get interview
     interview = await db.interviews.find_one({"id": interview_id}, {"_id": 0})
     if not interview:
         raise HTTPException(status_code=404, detail="Interview not found")
     
-    # Check if already evaluated
     existing_result = await db.results.find_one({"interview_id": interview_id}, {"_id": 0})
     if existing_result:
         return InterviewResult(**existing_result)
     
-    # Get candidate
     candidate = await db.candidates.find_one({"id": interview['candidate_id']}, {"_id": 0})
     
-    # Get all messages
     messages = await db.messages.find(
         {"interview_id": interview_id},
         {"_id": 0}
     ).sort("timestamp", 1).to_list(1000)
     
-    # Generate evaluation
     eval_prompt = get_evaluation_prompt(messages, candidate)
     eval_chat = LlmChat(
         api_key=os.environ['EMERGENT_LLM_KEY'],
@@ -376,10 +589,7 @@ async def evaluate_interview(interview_id: str):
     eval_msg = UserMessage(text=eval_prompt)
     eval_response = await eval_chat.send_message(eval_msg)
     
-    # Parse evaluation
-    import json
     try:
-        # Extract JSON from response
         eval_response = eval_response.strip()
         if "```json" in eval_response:
             eval_response = eval_response.split("```json")[1].split("```")[0]
@@ -387,7 +597,7 @@ async def evaluate_interview(interview_id: str):
             eval_response = eval_response.split("```")[1].split("```")[0]
         
         eval_data = json.loads(eval_response)
-    except (json.JSONDecodeError, KeyError, IndexError):
+    except Exception:
         eval_data = {
             "communication_score": 7,
             "technical_score": 7,
@@ -415,7 +625,8 @@ async def evaluate_interview(interview_id: str):
         total_score=total,
         strengths=eval_data.get('strengths', ''),
         weaknesses=eval_data.get('weaknesses', ''),
-        recommendation=eval_data.get('recommendation', '')
+        recommendation=eval_data.get('recommendation', ''),
+        expression_analysis="Analysis pending - video processing in progress"
     )
     
     await db.results.insert_one(result_obj.model_dump())
@@ -446,7 +657,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
