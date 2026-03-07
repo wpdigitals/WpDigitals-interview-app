@@ -8,7 +8,7 @@ import { Award, TrendingUp, AlertCircle, Home, Loader2 } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
-const LOGO_URL = 'https://customer-assets.emergentagent.com/job_code-screener/artifacts/fr7dkpe8_wp%20digitals%20logo.png';
+const LOGO_URL = 'https://customer-assets.emergentagent.com/job_code-screener/artifacts/79us4sj7_WP%20digitals%20logo%20new.png';
 
 const ResultPage = () => {
   const { interviewId } = useParams();
