@@ -118,10 +118,17 @@ const InterviewPage = () => {
 
   const requestCameraAccess = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: true, 
-        audio: true 
-      });
+      // Request camera permission with better mobile support
+      const constraints = {
+        video: {
+          facingMode: 'user', // Use front camera on mobile
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        },
+        audio: true
+      };
+      
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
       
       setRecordingStream(stream);
       setCameraActive(true);
@@ -155,7 +162,18 @@ const InterviewPage = () => {
       toast.success('Camera and recording active');
     } catch (error) {
       console.error('Camera access error:', error);
-      toast.error('Camera access denied. Please enable camera to continue.');
+      
+      // Specific error messages for better mobile UX
+      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+        toast.error('Camera permission denied. Please enable camera in your browser settings and refresh the page.');
+      } else if (error.name === 'NotFoundError') {
+        toast.error('No camera found. Please connect a camera and try again.');
+      } else if (error.name === 'NotReadableError') {
+        toast.error('Camera is already in use by another application.');
+      } else {
+        toast.error('Camera access denied. Please enable camera to continue.');
+      }
+      
       setCameraActive(false);
     }
   };
