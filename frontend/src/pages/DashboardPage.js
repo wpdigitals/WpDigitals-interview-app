@@ -85,7 +85,7 @@ const DashboardPage = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-12">
-        <div className="text-center space-y-8 mb-12">
+        <div className="text-center space-y-2">
           <h1 className="text-4xl sm:text-5xl font-bold text-slate-900">
             Welcome, <span className="text-indigo-600">{user?.name?.split(' ')[0]}</span>!
           </h1>
