@@ -61,6 +61,102 @@ class AIInterviewerAPITester:
             print(f"❌ Failed - Error: {str(e)}")
             return False, {}
 
+    def setup_test_user(self):
+        """Create test user and session using MongoDB"""
+        try:
+            timestamp = int(time.time())
+            self.user_id = f"test-user-{timestamp}"
+            self.session_token = f"test_session_{timestamp}"
+            
+            # Create test user and session in MongoDB
+            mongo_script = f"""
+use('test_database');
+db.users.insertOne({{
+  user_id: '{self.user_id}',
+  email: 'test.user.{timestamp}@example.com',
+  name: 'Test User',
+  picture: 'https://via.placeholder.com/150',
+  created_at: new Date().toISOString()
+}});
+db.user_sessions.insertOne({{
+  user_id: '{self.user_id}',
+  session_token: '{self.session_token}',
+  expires_at: new Date(Date.now() + 7*24*60*60*1000).toISOString(),
+  created_at: new Date().toISOString()
+}});
+"""
+            
+            result = subprocess.run(['mongosh', '--eval', mongo_script], 
+                                  capture_output=True, text=True, timeout=30)
+            
+            if result.returncode == 0:
+                print(f"✅ Test user created: {self.user_id}")
+                print(f"✅ Session token: {self.session_token}")
+                return True
+            else:
+                print(f"❌ Failed to create test user: {result.stderr}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Error setting up test user: {str(e)}")
+            return False
+
+    def test_auth_me(self):
+        """Test the /auth/me endpoint"""
+        success, response = self.run_test(
+            "Auth Me Endpoint",
+            "GET",
+            "auth/me",
+            200
+        )
+        
+        if success:
+            print(f"   User ID: {response.get('user_id', 'N/A')}")
+            print(f"   Email: {response.get('email', 'N/A')}")
+            print(f"   Name: {response.get('name', 'N/A')}")
+        
+        return success
+
+    def test_resume_parse(self):
+        """Test resume parsing endpoint"""
+        # Create a test resume file
+        test_resume_content = """
+John Doe
+Software Developer
+Email: john.doe@example.com
+Phone: +91 9876543210
+Address: 123 Tech Street, Bangalore, India
+
+Experience: 3 years in Android development
+Skills: Kotlin, Java, Android SDK, Room, Retrofit, MVVM
+LinkedIn: https://linkedin.com/in/johndoe
+GitHub: https://github.com/johndoe
+Portfolio: https://johndoe.dev
+
+Education: B.Tech Computer Science
+"""
+        
+        files = {'file': ('resume.txt', test_resume_content, 'text/plain')}
+        
+        success, response = self.run_test(
+            "Resume Parse",
+            "POST",
+            "resume/parse",
+            200,
+            files=files,
+            timeout=60
+        )
+        
+        if success:
+            print(f"   Parsed Name: {response.get('name', 'N/A')}")
+            print(f"   Parsed Email: {response.get('email', 'N/A')}")
+            print(f"   Parsed Role: {response.get('role', 'N/A')}")
+            print(f"   Parsed Experience: {response.get('experience', 'N/A')}")
+            print(f"   Parsed LinkedIn: {response.get('linkedin', 'N/A')}")
+            print(f"   Parsed GitHub: {response.get('github', 'N/A')}")
+        
+        return success
+
     def test_root_endpoint(self):
         """Test the root API endpoint"""
         success, response = self.run_test(
