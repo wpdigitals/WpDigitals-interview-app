@@ -503,6 +503,7 @@ const InterviewPage = () => {
 
       setQuestionStartTime(Date.now());
       setTimer(120);
+      setBeepPlayed(false); // Reset beep flag
 
       if (res.data.status === 'completed') {
         stopRecording();
