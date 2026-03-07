@@ -710,7 +710,6 @@ const InterviewPage = () => {
                   Skip Question
                 </Button>
               </div>
-              </Button>
             </div>
           </div>
         </div>
