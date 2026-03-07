@@ -11,7 +11,7 @@ import { Shield, LogOut, Trash2, Eye, Mail, Loader2, Video, FileText } from 'luc
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
-const LOGO_URL = 'https://customer-assets.emergentagent.com/job_code-screener/artifacts/fr7dkpe8_wp%20digitals%20logo.png';
+const LOGO_URL = 'https://customer-assets.emergentagent.com/job_code-screener/artifacts/79us4sj7_WP%20digitals%20logo%20new.png';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
