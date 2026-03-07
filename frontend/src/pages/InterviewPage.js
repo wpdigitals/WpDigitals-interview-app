@@ -234,20 +234,26 @@ const InterviewPage = () => {
     toast.error('Pasting is disabled during the interview');
   };
 
-  const handleTimeoutSubmit = async () => {
+  const handleTimeoutSubmit = async (useCurrentInput = false) => {
     const timeTaken = questionStartTime ? Math.floor((Date.now() - questionStartTime) / 1000) : 120;
+    
+    // Use the current typed input if available, otherwise empty
+    const messageContent = useCurrentInput && input.trim() ? input.trim() : '';
+    const displayContent = messageContent || '(No answer provided - Time expired)';
+    
+    setInput(''); // Clear input
     setLoading(true);
 
-    // Add empty user message to UI
+    // Add user message to UI
     setMessages(prev => [...prev, {
       role: 'user',
-      content: '(No answer provided - Time expired)',
+      content: displayContent,
       timestamp: new Date().toISOString()
     }]);
 
     try {
       const res = await axios.post(`${API}/interviews/${interviewId}/message`, {
-        content: '',
+        content: messageContent,
         time_taken: timeTaken,
         is_timeout: true
       }, { withCredentials: true });
@@ -266,7 +272,6 @@ const InterviewPage = () => {
           termination_reason: res.data.termination_reason
         }));
         toast.info('Interview has been terminated');
-        // Redirect to termination page
         setTimeout(() => {
           navigate(`/interview/${interviewId}/terminated`);
         }, 2000);
@@ -288,6 +293,7 @@ const InterviewPage = () => {
       // Reset timer for new question
       setQuestionStartTime(Date.now());
       setTimer(120);
+      setBeepPlayed(false); // Reset beep flag
 
       if (res.data.status === 'completed') {
         stopRecording();
