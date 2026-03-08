@@ -76,39 +76,39 @@ const InterviewTerminated = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Header */}
-      <header className="px-6 py-6 bg-white/80 backdrop-blur-sm border-b border-slate-200">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <img src={LOGO_URL} alt="WP Digitals" className="h-12 object-contain" />
-          <div className="flex gap-3">
-            <Button onClick={() => navigate('/')} variant="outline" className="gap-2">
-              <Home className="w-4 h-4" />
+      <header className="px-4 sm:px-6 py-4 sm:py-6 bg-white/80 backdrop-blur-sm border-b border-slate-200">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+          <img src={LOGO_URL} alt="WP Digitals" className="h-10 sm:h-12 object-contain" />
+          <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+            <Button onClick={() => navigate('/')} variant="outline" className="gap-2 text-xs sm:text-sm flex-1 sm:flex-none">
+              <Home className="w-3 h-3 sm:w-4 sm:h-4" />
               Home
             </Button>
-            <Button onClick={handleLogout} variant="outline" className="gap-2">
-              <LogOut className="w-4 h-4" />
+            <Button onClick={handleLogout} variant="outline" className="gap-2 text-xs sm:text-sm flex-1 sm:flex-none">
+              <LogOut className="w-3 h-3 sm:w-4 sm:h-4" />
               Logout
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 py-12">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* Thank You Message */}
-        <div className="text-center mb-12">
-          <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Activity className="w-10 h-10 text-orange-600" />
+        <div className="text-center mb-8 sm:mb-12">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+            <Activity className="w-8 h-8 sm:w-10 sm:h-10 text-orange-600" />
           </div>
-          <h1 className="text-4xl font-bold text-slate-900 mb-4">Interview Completed</h1>
-          <p className="text-xl text-slate-600 mb-2">
+          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-3 sm:mb-4">Interview Completed</h1>
+          <p className="text-lg sm:text-xl text-slate-600 mb-2">
             Thank you for your time and participation!
           </p>
-          <p className="text-slate-600">
+          <p className="text-sm sm:text-base text-slate-600 px-4">
             Our team will review your responses and get back to you soon.
           </p>
         </div>
 
         {/* Statistics Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <Card className="border-slate-200 shadow-lg">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
