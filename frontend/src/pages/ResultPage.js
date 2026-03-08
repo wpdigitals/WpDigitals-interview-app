@@ -72,15 +72,15 @@ const ResultPage = () => {
   }
 
   return (
-    <div data-testid="result-page" className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-12 px-4">
-      <div className="max-w-4xl mx-auto space-y-8">
+    <div data-testid="result-page" className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8 sm:py-12 px-4">
+      <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
         {/* Header */}
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-3 sm:space-y-4">
           <div className="flex items-center justify-center gap-2">
-            <Award className="w-12 h-12 text-indigo-600" />
+            <Award className="w-10 h-10 sm:w-12 sm:h-12 text-indigo-600" />
           </div>
-          <h1 className="text-4xl font-bold text-slate-900">Evaluation Report</h1>
-          <p className="text-slate-600">Detailed analysis of your interview performance</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Evaluation Report</h1>
+          <p className="text-sm sm:text-base text-slate-600 px-4">Detailed analysis of your interview performance</p>
         </div>
 
         {/* Total Score */}
