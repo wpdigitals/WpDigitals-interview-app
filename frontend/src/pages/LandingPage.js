@@ -55,13 +55,13 @@ const LandingPage = () => {
         </div>
 
         {/* Registration & Interview Process */}
-        <div className="py-16">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">Registration & Interview Process</h2>
-            <p className="text-lg text-slate-600">Complete your interview in 4 simple steps</p>
+        <div className="py-12 sm:py-16 px-4 sm:px-6">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Registration & Interview Process</h2>
+            <p className="text-base sm:text-lg text-slate-600">Complete your interview in 4 simple steps</p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             {/* Step 1 */}
             <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-lg hover:shadow-xl transition-shadow">
               <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6">
