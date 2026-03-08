@@ -77,25 +77,25 @@ const RegistrationPart1 = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8 sm:py-12 px-4">
       <div className="max-w-3xl mx-auto">
         {/* Progress Bar */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-semibold text-indigo-600">Step 1 of 3</span>
-            <span className="text-sm text-slate-600">Upload Resume</span>
+            <span className="text-xs sm:text-sm font-semibold text-indigo-600">Step 1 of 3</span>
+            <span className="text-xs sm:text-sm text-slate-600">Upload Resume</span>
           </div>
           <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
             <div className="h-full bg-indigo-600 rounded-full" style={{ width: '33.33%' }} />
           </div>
         </div>
 
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <img src={LOGO_URL} alt="WP Digitals" className="h-32 object-contain max-w-[500px]" />
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="flex items-center justify-center mb-3 sm:mb-4">
+            <img src={LOGO_URL} alt="WP Digitals" className="h-12 sm:h-16 object-contain max-w-[250px] sm:max-w-[500px]" />
           </div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Upload Your Resume</h1>
-          <p className="text-slate-600">Smart parsing will automatically extract your details</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Upload Your Resume</h1>
+          <p className="text-sm sm:text-base text-slate-600">Smart parsing will automatically extract your details</p>
         </div>
 
         <Card data-testid="resume-upload-card" className="border-slate-200 shadow-xl">
