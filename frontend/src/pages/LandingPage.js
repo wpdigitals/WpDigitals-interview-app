@@ -28,25 +28,25 @@ const LandingPage = () => {
       </header>
 
       {/* Hero Section */}
-      <main className="max-w-7xl mx-auto px-6">
-        <div className="py-20 text-center space-y-8">
-          <div className="space-y-6">
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-slate-900 leading-tight">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="py-12 sm:py-20 text-center space-y-6 sm:space-y-8">
+          <div className="space-y-4 sm:space-y-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-slate-900 leading-tight px-4">
               Technical Interview Platform
               <span className="block text-blue-600 mt-2">For Software Developers</span>
             </h1>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed px-4">
               WP Digitals' comprehensive interview solution for evaluating software development talent. 
               Streamlined process from registration to detailed evaluation reports.
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4 px-4">
             <Button 
               data-testid="get-started-btn"
               onClick={() => navigate('/login')} 
               size="lg"
-              className="bg-blue-600 hover:bg-blue-700 text-lg px-10 py-7 rounded-xl shadow-lg hover:shadow-xl transition-all"
+              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-base sm:text-lg px-8 sm:px-10 py-6 sm:py-7 rounded-xl shadow-lg hover:shadow-xl transition-all"
             >
               Get Started
               <ArrowRight className="ml-2 w-5 h-5" />
