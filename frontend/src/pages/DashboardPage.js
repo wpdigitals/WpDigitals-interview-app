@@ -59,24 +59,24 @@ const DashboardPage = () => {
   return (
     <div data-testid="dashboard-page" className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Header */}
-      <header className="px-6 py-6 border-b border-slate-200 bg-white/80 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src={LOGO_URL} alt="WP Digitals" className="h-28 object-contain max-w-[400px]" />
+      <header className="px-4 sm:px-6 py-4 sm:py-6 border-b border-slate-200 bg-white/80 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center">
+            <img src={LOGO_URL} alt="WP Digitals" className="h-10 sm:h-12 object-contain" />
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
             {user?.picture && (
-              <img src={user.picture} alt={user.name} className="w-10 h-10 rounded-full" />
+              <img src={user.picture} alt={user.name} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full" />
             )}
-            <span className="text-slate-700 font-medium">{user?.name}</span>
+            <span className="text-sm sm:text-base text-slate-700 font-medium truncate">{user?.name}</span>
             <Button
               data-testid="logout-btn"
               onClick={handleLogout}
               variant="outline"
               size="sm"
-              className="gap-2"
+              className="gap-2 text-xs sm:text-sm"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-3 h-3 sm:w-4 sm:h-4" />
               Logout
             </Button>
           </div>
@@ -84,12 +84,12 @@ const DashboardPage = () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-12">
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl sm:text-5xl font-bold text-slate-900">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <div className="text-center space-y-6 sm:space-y-8 mb-8 sm:mb-12">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900">
             Welcome, <span className="text-indigo-600">{user?.name?.split(' ')[0]}</span>!
           </h1>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto px-4">
             Ready to showcase your skills? Start your technical interview journey now.
           </p>
         </div>
