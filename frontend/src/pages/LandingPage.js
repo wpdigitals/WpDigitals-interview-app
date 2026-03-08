@@ -109,13 +109,13 @@ const LandingPage = () => {
         </div>
 
         {/* Interview Features */}
-        <div className="py-16 bg-gradient-to-br from-blue-50 to-white rounded-3xl my-16 px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">Interview Features</h2>
-            <p className="text-lg text-slate-600">Comprehensive evaluation across multiple dimensions</p>
+        <div className="py-12 sm:py-16 bg-gradient-to-br from-blue-50 to-white rounded-3xl my-12 sm:my-16 px-4 sm:px-8">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Interview Features</h2>
+            <p className="text-base sm:text-lg text-slate-600">Comprehensive evaluation across multiple dimensions</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             <div className="bg-white rounded-2xl p-8 border border-slate-200">
               <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mb-6">
                 <Users className="w-7 h-7 text-green-600" />
