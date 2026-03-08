@@ -96,7 +96,7 @@ const ResultPage = () => {
         </Card>
 
         {/* Individual Scores */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <Card className="border-slate-200 shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader>
               <CardTitle className="text-lg">Communication</CardTitle>
