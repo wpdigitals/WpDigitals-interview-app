@@ -218,12 +218,12 @@ const ResultPage = () => {
         </Card>
 
         {/* Actions */}
-        <div className="flex justify-center gap-4 pt-4">
+        <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 pt-4">
           <Button
             data-testid="home-btn"
             onClick={() => navigate('/')}
             variant="outline"
-            className="gap-2"
+            className="gap-2 w-full sm:w-auto"
           >
             <Home className="w-4 h-4" />
             Back to Home
