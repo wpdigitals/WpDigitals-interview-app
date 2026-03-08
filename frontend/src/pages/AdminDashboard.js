@@ -121,31 +121,31 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-10 shadow-sm">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <img src={LOGO_URL} alt="WP Digitals" className="h-12 object-contain max-w-[180px]" />
+      <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4 sticky top-0 z-10 shadow-sm">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <img src={LOGO_URL} alt="WP Digitals" className="h-8 sm:h-12 object-contain max-w-[120px] sm:max-w-[180px]" />
             <div className="flex items-center gap-2">
-              <Shield className="w-5 h-5 text-blue-600" />
-              <span className="text-lg font-semibold text-slate-900">Admin Dashboard</span>
+              <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+              <span className="text-sm sm:text-lg font-semibold text-slate-900">Admin</span>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="text-slate-700">{admin?.name}</span>
+          <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
+            <span className="text-xs sm:text-sm text-slate-700 truncate">{admin?.name}</span>
             <Button
               onClick={handleLogout}
               variant="outline"
               size="sm"
-              className="gap-2"
+              className="gap-2 text-xs sm:text-sm"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-3 h-3 sm:w-4 sm:h-4" />
               Logout
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Stats */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           <Card>
