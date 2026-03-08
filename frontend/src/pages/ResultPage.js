@@ -179,7 +179,7 @@ const ResultPage = () => {
         </div>
 
         {/* Strengths & Weaknesses */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           <Card className="border-green-200 bg-green-50/50 shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-green-700">
