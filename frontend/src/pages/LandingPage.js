@@ -191,9 +191,9 @@ const LandingPage = () => {
         </div>
 
         {/* Interview Monitoring */}
-        <div className="py-16">
-          <div className="bg-white rounded-3xl p-12 border border-slate-200 shadow-xl">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="py-12 sm:py-16 px-4 sm:px-6">
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-12 border border-slate-200 shadow-xl">
+            <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
               <div>
                 <h2 className="text-4xl font-bold text-slate-900 mb-6">Advanced Interview Monitoring</h2>
                 <p className="text-lg text-slate-600 mb-8 leading-relaxed">
