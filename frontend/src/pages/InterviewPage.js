@@ -33,8 +33,8 @@ const InterviewPage = () => {
     loadInterview();
     loadMessages();
     requestCameraAccess();
-  }, [interviewId]);
-
+  },[interviewId, loadInterview, loadMessages, requestCameraAccess]);
+  
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -56,8 +56,8 @@ const InterviewPage = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [lastActivityTime, interview?.status]);
-
+  }, [lastActivityTime, interview?.status, handleInactivityTermination]);
+  
   // Timer countdown with auto-submit
   useEffect(() => {
     if (!questionStartTime || interview?.status === 'completed' || interview?.status === 'terminated') return;
@@ -89,7 +89,7 @@ const InterviewPage = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [questionStartTime, interview?.status, loading, beepPlayed]);
+  },  [questionStartTime, interview?.status, loading, beepPlayed, handleTimeoutSubmit]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
