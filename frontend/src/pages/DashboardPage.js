@@ -16,24 +16,28 @@ const DashboardPage = () => {
   const [loading, setLoading] = useState(!location.state?.user);
 
   useEffect(() => {
-    // Skip auth check if user was passed from AuthCallback
-    if (location.state?.user) return;
+  if (location.state?.user) {
+    setLoading(false);
+    return;
+  }
 
-    const checkAuth = async () => {
-      try {
-        const response = await axios.get(`${API}/auth/me`, {
-          withCredentials: true
-        });
-        setUser(response.data);
-      } catch (error) {
-        navigate('/login');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const checkAuth = async () => {
+    try {
+      const response = await axios.get(`${API}/auth/me`, {
+        withCredentials: true
+      });
+      setUser(response.data);
+    } catch (error) {
+      navigate('/login');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    checkAuth();
-  }, [location.state?.user, navigate]);
+  checkAuth();
+
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
 
   const handleLogout = async () => {
     try {
