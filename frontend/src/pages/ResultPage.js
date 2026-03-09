@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Button } from '../components/ui/button';
@@ -16,21 +16,41 @@ const ResultPage = () => {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(true);
 
+ const loadResult = useCallback(async () => {
+  try {
+    const res = await axios.get(`${API}/interviews/${interviewId}/result`);
+    setResult(res.data);
+  } catch (error) {
+    console.error('Failed to load result:', error);
+    toast.error('Failed to load evaluation results');
+  } finally {
+    setLoading(false);
+  }
+}, [interviewId]);
+
+  useEffect(() => {
+  loadResult();
+}, [loadResult]);
+  
   useEffect(() => {
     loadResult();
   }, [interviewId]);
 
-  const loadResult = async () => {
-    try {
-      const res = await axios.get(`${API}/interviews/${interviewId}/result`);
-      setResult(res.data);
-    } catch (error) {
-      console.error('Failed to load result:', error);
-      toast.error('Failed to load evaluation results');
-    } finally {
-      setLoading(false);
-    }
-  };
+ const loadResult = useCallback(async () => {
+  try {
+    const res = await axios.get(`${API}/interviews/${interviewId}/result`);
+    setResult(res.data);
+  } catch (error) {
+    console.error('Failed to load result:', error);
+    toast.error('Failed to load evaluation results');
+  } finally {
+    setLoading(false);
+  }
+}, [interviewId]);
+
+  useEffect(() => {
+  loadResult();
+}, [loadResult]);
 
   const getRecommendationColor = (recommendation) => {
     const rec = recommendation.toLowerCase();
