@@ -607,30 +607,27 @@ async def parse_resume(file: UploadFile = File(...)):
             raise HTTPException(status_code=400, detail="Could not extract text from file")
         
         # Use AI to parse resume
-        chat = LlmChat(
-            api_key=os.environ['EMERGENT_LLM_KEY'],
-            session_id=f"resume-parse-{uuid.uuid4()}",
-            system_message="""You are a resume parser. Extract structured information from resumes.
-Return ONLY valid JSON with these fields:
-{
-  "name": "full name",
-  "email": "email address",
-  "phone": "phone number",
-  "role": "job title/role",
-  "experience": "years of experience",
-  "tech_stack": "comma-separated skills",
-  "address": "full address if available",
-  "linkedin": "LinkedIn URL if available",
-  "github": "GitHub URL if available",
-  "twitter": "Twitter URL if available",
-  "portfolio": "Portfolio URL if available"
-}
-If a field is not found, use empty string."""
-        ).with_model("openai", "gpt-4o-mini")
-        
-        msg = UserMessage(text=f"Parse this resume:\n\n{resume_text}")
-        response = await chat.send_message(msg)
-        
+        client = AsyncOpenAI(api_key=os.environ["EMERGENT_LLM_KEY"])
+
+response = await client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[
+        {
+            "role": "system",
+            "content": """You are a resume parser. Extract structured information from resumes.
+Return ONLY valid JSON with fields:
+name, email, phone, role, experience, tech_stack, address, linkedin, github, twitter, portfolio.
+If a field is missing return empty string."""
+        },
+        {
+            "role": "user",
+            "content": f"Parse this resume:\n\n{resume_text}"
+        }
+    ]
+)
+
+response_text = response.choices[0].message.content
+                   
         # Parse JSON response
         try:
             if "```json" in response:
@@ -638,7 +635,7 @@ If a field is not found, use empty string."""
             elif "```" in response:
                 response = response.split("```")[1].split("```")[0]
             
-            parsed_data = json.loads(response.strip())
+           parsed_data = json.loads(response_text.strip())
             parsed_data['resume_text'] = resume_text
             return parsed_data
         except json.JSONDecodeError:
