@@ -205,7 +205,7 @@ IMPORTANT: Ask only ONE question at a time and wait for response. Do NOT provide
     if phase == "init":
         return base_msg + """\nGreet the candidate warmly and explain the interview process:
 1. PHASE 1: 10 behavioral questions (communication, dedication, attitude, learning)
-2. PHASE 2: 20 technical questions based on their tech stack
+2. PHASE 2: 10 technical questions based on their tech stack
 3. PHASE 3: 2 scenario-based practical questions
 
 Ask if they're ready to begin. Keep it brief and professional."""
@@ -233,12 +233,12 @@ Ask 20 UNIQUE technical questions focused on: {tech_focus}
 
 IMPORTANT:
 - Ask ONE question at a time
-- NEVER repeat questions already asked
+- NEVER repeat or same type questions already asked
 - Check conversation history to avoid duplicates
 - Each question should assess a different technical concept
 - Progress from basic to advanced topics
 
-After 20 questions, inform them Phase 2 is complete."""
+After 10 questions, inform them Phase 2 is complete."""
     
     elif phase == "phase3":
         return base_msg + """\nPHASE 3: Practical Thinking (Final Phase)
@@ -625,7 +625,7 @@ Return ONLY valid JSON with these fields:
   "portfolio": "Portfolio URL if available"
 }
 If a field is not found, use empty string."""
-        ).with_model("openai", "gpt-5.2")
+        ).with_model("openai", "gpt-4o-mini")
         
         msg = UserMessage(text=f"Parse this resume:\n\n{resume_text}")
         response = await chat.send_message(msg)
@@ -699,7 +699,7 @@ async def start_interview(interview_data: InterviewCreate):
         api_key=os.environ['EMERGENT_LLM_KEY'],
         session_id=interview_obj.session_id,
         system_message=system_msg
-    ).with_model("openai", "gpt-5.2")
+    ).with_model("openai", "gpt-4o-mini")
     
     user_msg = UserMessage(text="Start the interview")
     greeting = await chat.send_message(user_msg)
@@ -788,7 +788,7 @@ async def send_message(interview_id: str, message: MessageCreate):
         api_key=os.environ['EMERGENT_LLM_KEY'],
         session_id=interview['session_id'],
         system_message=system_msg
-    ).with_model("openai", "gpt-5.2")
+    ).with_model("openai", "gpt-4o-mini")
     
     user_msg = UserMessage(text=message.content if message.content.strip() else "No answer provided")
     response = await chat.send_message(user_msg)
@@ -868,7 +868,7 @@ async def evaluate_interview(interview_id: str):
         api_key=os.environ['EMERGENT_LLM_KEY'],
         session_id=f"eval-{interview_id}",
         system_message="You are an interview evaluator. Return only valid JSON."
-    ).with_model("openai", "gpt-5.2")
+    ).with_model("openai", "gpt-4o-mini")
     
     eval_msg = UserMessage(text=eval_prompt)
     eval_response = await eval_chat.send_message(eval_msg)
