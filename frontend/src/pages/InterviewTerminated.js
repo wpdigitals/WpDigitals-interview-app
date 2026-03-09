@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Button } from '../components/ui/button';
@@ -14,11 +14,38 @@ const InterviewTerminated = () => {
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+const loadStats = useCallback(async () => {
+  try {
+    const messagesRes = await axios.get(`${API}/interviews/${interviewId}/messages`, {
+      withCredentials: true
+    });
 
+    const messages = messagesRes.data;
+    const userMessages = messages.filter(m => m.role === 'user');
+
+    const questionsAnswered = userMessages.filter(m => m.content && m.content.trim() !== '').length;
+    const totalTimeTaken = userMessages.reduce((sum, m) => sum + (m.time_taken || 0), 0);
+    const avgTimePerQuestion = questionsAnswered > 0 ? Math.floor(totalTimeTaken / questionsAnswered) : 0;
+
+    setStats({
+      questionsAnswered,
+      totalTimeTaken,
+      avgTimePerQuestion,
+      totalQuestions: messages.filter(m => m.role === 'assistant').length - 1
+    });
+  } catch (error) {
+    console.error('Failed to load stats:', error);
+  } finally {
+    setLoading(false);
+  }
+}, [interviewId]);
+  
   useEffect(() => {
     loadStats();
   }, [interviewId]);
-
+useEffect(() => {
+  loadStats();
+}, [loadStats]);
   const loadStats = async () => {
     try {
       const messagesRes = await axios.get(`${API}/interviews/${interviewId}/messages`, {
