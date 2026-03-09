@@ -41,8 +41,12 @@ const loadStats = useCallback(async () => {
 }, [interviewId]);
   
   useEffect(() => {
-    loadStats();
-  }, [interviewId]);
+  loadStats();
+
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, [interviewId]);
+
+  
 useEffect(() => {
   loadStats();
 }, [loadStats]);
